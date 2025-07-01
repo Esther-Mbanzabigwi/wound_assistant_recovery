@@ -1,227 +1,206 @@
-import Button from "@/components/ui/Button";
-import Card from "@/components/ui/Card";
+import { Colors } from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
+import { Ionicons } from "@expo/vector-icons";
 import { Link } from "expo-router";
 import React from "react";
-import { Image, ScrollView, StyleSheet, Text, View } from "react-native";
-
-const LOGO = require("@/assets/images/icon.png"); // Use your logo or a placeholder
+import {
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
+} from "react-native";
 
 export default function HomeScreen() {
   const colorScheme = useColorScheme();
-  const isDark = colorScheme === "dark";
-
-  const features = [
-    {
-      icon: "📸",
-      title: "Smart Monitoring",
-      description:
-        "Capture wound photos with your phone camera and get instant AI-powered health assessments",
-    },
-    {
-      icon: "🛡️",
-      title: "Early Detection",
-      description:
-        "Get alerts for potential infections or complications before they become serious",
-    },
-  ];
+  const colors = Colors[colorScheme ?? "light"];
 
   return (
-    <View style={styles.bg}>
-      {/* Header */}
+    <View style={styles.container}>
       <View style={styles.header}>
-        <View style={styles.logoRow}>
-          <Image source={LOGO} style={styles.logo} />
-          <Text style={styles.brand}>WoundTrack</Text>
+        <View style={styles.logoContainer}>
+          <Ionicons name="heart" size={32} color="#3B82F6" />
+          <Text style={styles.logoText}>WoundTrack</Text>
         </View>
-        <View style={styles.headerNav}>
-          <Link href="/(auth)/login" asChild>
-            <Text style={styles.headerLink}>Login</Text>
+        <View style={styles.headerButtons}>
+          <Link href="/login" asChild>
+            <TouchableOpacity>
+              <Text style={styles.loginButton}>Login</Text>
+            </TouchableOpacity>
           </Link>
-          <Link href="/(auth)/register" asChild>
-            <Text style={styles.headerButton}>Get Started</Text>
+          <Link href="/register" asChild>
+            <TouchableOpacity style={styles.getStartedButton}>
+              <Text style={styles.getStartedButtonText}>Get Started</Text>
+            </TouchableOpacity>
           </Link>
         </View>
       </View>
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
-        {/* Hero Section */}
-        <View style={styles.heroSection}>
-          <Text style={styles.heroTitle}>Your Recovery, Monitored</Text>
-          <Text style={styles.heroSubtitle}>
-            AI-powered C-section wound monitoring for new mothers. Track your
-            healing progress, get instant health insights, and find nearby
-            medical care when you need it most.
-          </Text>
-          <View style={styles.heroActions}>
-            <Link href="/(auth)/register" asChild>
-              <Button
-                title="Start Tracking"
-                variant="primary"
-                onPress={() => {}}
-                style={styles.heroButton}
-              />
-            </Link>
-            <Link href="/(auth)/login" asChild>
-              <Button
-                title="Login"
-                variant="secondary"
-                onPress={() => {}}
-                style={styles.heroButton}
-              />
-            </Link>
+
+      <View style={styles.content}>
+        <Text style={styles.title}>
+          Your Recovery,{"\n"}
+          <Text style={styles.titleHighlight}>Monitored</Text>
+        </Text>
+
+        <Text style={styles.description}>
+          C-section wound monitoring for new mothers. Track your healing
+          progress, get instant health insights, and find nearby medical care when
+          you need it most.
+        </Text>
+
+        <View style={styles.features}>
+          <View style={styles.featureCard}>
+            <View style={styles.featureIcon}>
+              <Ionicons name="camera" size={24} color="#3B82F6" />
+            </View>
+            <Text style={styles.featureTitle}>Smart Monitoring</Text>
+            <Text style={styles.featureDescription}>
+              Capture wound photos with your phone camera and get instant
+              Health assessments
+            </Text>
+          </View>
+
+          <View style={styles.featureCard}>
+            <View style={styles.featureIcon}>
+              <Ionicons name="shield-checkmark" size={24} color="#3B82F6" />
+            </View>
+            <Text style={styles.featureTitle}>Early Detection</Text>
+            <Text style={styles.featureDescription}>
+              Get alerts for potential infections or complications before they
+              become serious
+            </Text>
+          </View>
+
+          <View style={styles.featureCard}>
+            <View style={styles.featureIcon}>
+              <Ionicons name="medkit" size={24} color="#3B82F6" />
+            </View>
+            <Text style={styles.featureTitle}>Medical Support</Text>
+            <Text style={styles.featureDescription}>
+              Find nearby healthcare facilities and get professional help when
+              needed
+            </Text>
           </View>
         </View>
-        {/* Features Section */}
-        <Text style={styles.sectionTitle}>
-          Everything You Need for Safe Recovery
-        </Text>
-        <View style={styles.featuresList}>
-          {features.map((feature, idx) => (
-            <Card key={idx} style={styles.featureCard}>
-              <View style={styles.featureIconWrap}>
-                <Text style={styles.featureIcon}>{feature.icon}</Text>
-              </View>
-              <Text style={styles.featureTitle}>{feature.title}</Text>
-              <Text style={styles.featureDesc}>{feature.description}</Text>
-            </Card>
-          ))}
-        </View>
-      </ScrollView>
+
+        <Link href="/register" asChild>
+          <TouchableOpacity style={styles.startTrackingButton}>
+            <Text style={styles.startTrackingButtonText}>Start Tracking</Text>
+            <Ionicons name="arrow-forward" size={20} color="white" />
+          </TouchableOpacity>
+        </Link>
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  bg: {
+  container: {
     flex: 1,
-    backgroundColor: "#f6faff",
+    backgroundColor: "#F8FAFC",
   },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingHorizontal: 18,
-    paddingTop: 18,
-    paddingBottom: 10,
-    backgroundColor: "#fff",
-    borderBottomWidth: 1,
-    borderBottomColor: "#e5e7eb",
+    padding: 20,
+    paddingTop: 60,
   },
-  logoRow: {
+  logoContainer: {
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
   },
-  logo: {
-    width: 32,
-    height: 32,
-    borderRadius: 8,
-    marginRight: 6,
-  },
-  brand: {
+  logoText: {
     fontSize: 20,
-    fontWeight: "700",
-    color: "#2563eb",
-    letterSpacing: 0.5,
+    fontWeight: "600",
+    color: "#1E293B",
   },
-  headerNav: {
+  headerButtons: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 8,
+    gap: 16,
   },
-  headerLink: {
-    fontSize: 15,
-    color: "#334155",
-    marginRight: 8,
+  loginButton: {
+    fontSize: 16,
+    color: "#3B82F6",
     fontWeight: "500",
   },
-  headerButton: {
-    backgroundColor: "#111827",
-    color: "#fff",
-    fontWeight: "600",
-    fontSize: 15,
-    borderRadius: 6,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    overflow: "hidden",
+  getStartedButton: {
+    backgroundColor: "#3B82F6",
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
   },
-  scrollContent: {
-    alignItems: "center",
-    paddingBottom: 40,
+  getStartedButtonText: {
+    color: "white",
+    fontSize: 14,
+    fontWeight: "500",
   },
-  heroSection: {
-    marginTop: 32,
-    marginBottom: 32,
-    alignItems: "center",
-    width: "90%",
-    alignSelf: "center",
+  content: {
+    flex: 1,
+    padding: 20,
+    paddingTop: 40,
   },
-  heroTitle: {
-    fontSize: 28,
+  title: {
+    fontSize: 36,
     fontWeight: "bold",
-    color: "#1e293b",
+    color: "#1E293B",
+    marginBottom: 16,
     textAlign: "center",
-    marginBottom: 12,
   },
-  heroSubtitle: {
+  titleHighlight: {
+    color: "#3B82F6",
+  },
+  description: {
     fontSize: 16,
-    color: "#334155",
+    color: "#64748B",
     textAlign: "center",
-    marginBottom: 24,
+    marginBottom: 48,
     lineHeight: 24,
   },
-  heroActions: {
-    flexDirection: "row",
-    gap: 12,
-    justifyContent: "center",
-  },
-  heroButton: {
-    minWidth: 130,
-  },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: "700",
-    color: "#1e293b",
-    marginBottom: 18,
-    textAlign: "center",
-  },
-  featuresList: {
-    width: "90%",
-    alignSelf: "center",
-    marginTop: 0,
+  features: {
+    gap: 24,
+    marginBottom: 48,
   },
   featureCard: {
+    backgroundColor: "white",
+    borderRadius: 16,
+    padding: 24,
     alignItems: "center",
-    marginBottom: 18,
-    paddingVertical: 28,
-    paddingHorizontal: 18,
-  },
-  featureIconWrap: {
-    backgroundColor: "#e0e7ff",
-    borderRadius: 32,
-    width: 48,
-    height: 48,
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 10,
+    gap: 12,
   },
   featureIcon: {
-    fontSize: 28,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: "#EEF2FF",
+    alignItems: "center",
+    justifyContent: "center",
   },
   featureTitle: {
-    fontSize: 17,
-    fontWeight: "700",
-    color: "#1e293b",
-    marginBottom: 6,
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#1E293B",
     textAlign: "center",
   },
-  featureDesc: {
-    fontSize: 15,
-    color: "#334155",
+  featureDescription: {
+    fontSize: 14,
+    color: "#64748B",
     textAlign: "center",
-    lineHeight: 22,
+    lineHeight: 20,
+  },
+  startTrackingButton: {
+    backgroundColor: "#3B82F6",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    paddingVertical: 16,
+    borderRadius: 12,
+  },
+  startTrackingButtonText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "600",
   },
 });

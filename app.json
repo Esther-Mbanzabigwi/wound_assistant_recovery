@@ -8,6 +8,7 @@
     "scheme": "woundassistantrecovery",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
+    "sdkVersion": "53.0.0",
     "ios": {
       "supportsTablet": true
     },
@@ -16,7 +17,8 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "package": "com.anonymous.wound_assistant_recovery"
     },
     "web": {
       "bundler": "metro",

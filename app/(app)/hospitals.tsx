@@ -1,256 +1,170 @@
 import { Colors } from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
-import React, { useEffect, useState } from "react";
+import { Ionicons } from "@expo/vector-icons";
+import { Link } from "expo-router";
+import React from "react";
 import {
-  Alert,
-  Linking,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from "react-native";
-
-interface Hospital {
-  id: string;
-  name: string;
-  address: string;
-  distance: string;
-  rating: number;
-  phone: string;
-  isOpen: boolean;
-  specialties: string[];
-  coordinates: {
-    latitude: number;
-    longitude: number;
-  };
-}
 
 export default function HospitalsScreen() {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? "light"];
-  const [nearbyHospitals, setNearbyHospitals] = useState<Hospital[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
 
-  // Mock data - in real app, this would come from a maps API
-  const mockHospitals: Hospital[] = [
+  const hospitals = [
     {
-      id: "1",
       name: "City General Hospital",
-      address: "123 Main Street, Downtown",
-      distance: "0.8 km",
+      distance: "0.8",
       rating: 4.5,
-      phone: "+1-555-0123",
-      isOpen: true,
-      specialties: ["Emergency Care", "Wound Care", "Dermatology"],
-      coordinates: { latitude: 37.7749, longitude: -122.4194 },
+      address: "123 Main Street, Downtown",
+      phone: "(555) 123-4567",
+      hours: "24/7",
+      waitTime: "~15 mins",
+      specialties: ["Emergency Care", "Maternity", "Surgery"],
     },
     {
-      id: "2",
-      name: "Community Medical Center",
+      name: "Women's Health Center",
+      distance: "1.2",
+      rating: 4.8,
       address: "456 Oak Avenue, Midtown",
-      distance: "1.2 km",
-      rating: 4.2,
-      phone: "+1-555-0456",
-      isOpen: true,
-      specialties: ["Urgent Care", "Family Medicine", "Wound Treatment"],
-      coordinates: { latitude: 37.7849, longitude: -122.4094 },
-    },
-    {
-      id: "3",
-      name: "University Medical Center",
-      address: "789 University Blvd, Campus District",
-      distance: "2.1 km",
-      rating: 4.7,
-      phone: "+1-555-0789",
-      isOpen: true,
-      specialties: ["Trauma Center", "Plastic Surgery", "Infectious Disease"],
-      coordinates: { latitude: 37.7649, longitude: -122.4294 },
-    },
-    {
-      id: "4",
-      name: "Downtown Urgent Care",
-      address: "321 Business District, Downtown",
-      distance: "1.5 km",
-      rating: 4.0,
-      phone: "+1-555-0321",
-      isOpen: false,
-      specialties: ["Urgent Care", "Minor Procedures", "Wound Care"],
-      coordinates: { latitude: 37.7749, longitude: -122.4094 },
+      phone: "(555) 987-6543",
+      hours: "6 AM - 10 PM",
+      waitTime: "~30 mins",
+      specialties: ["Women's Health", "Postpartum Care", "OB/GYN"],
     },
   ];
 
-  useEffect(() => {
-    // Simulate loading hospitals based on location
-    setTimeout(() => {
-      setNearbyHospitals(mockHospitals);
-      setIsLoading(false);
-    }, 1000);
-  }, []);
-
-  const handleCallHospital = (phone: string) => {
-    Linking.openURL(`tel:${phone}`).catch(() => {
-      Alert.alert("Error", "Unable to make phone call");
-    });
-  };
-
-  const handleGetDirections = (hospital: Hospital) => {
-    const url = `https://maps.google.com/?q=${hospital.coordinates.latitude},${hospital.coordinates.longitude}`;
-    Linking.openURL(url).catch(() => {
-      Alert.alert("Error", "Unable to open maps");
-    });
-  };
-
-  const handleEmergencyCall = () => {
-    Alert.alert("Emergency Services", "Call emergency services?", [
-      { text: "Cancel", style: "cancel" },
-      {
-        text: "Call 911",
-        onPress: () => Linking.openURL("tel:911"),
-        style: "destructive",
-      },
-    ]);
-  };
-
-  const renderHospitalCard = (hospital: Hospital) => (
-    <View
-      key={hospital.id}
-      style={[styles.hospitalCard, { backgroundColor: colors.card }]}
-    >
-      <View style={styles.hospitalHeader}>
-        <View style={styles.hospitalInfo}>
-          <Text style={[styles.hospitalName, { color: colors.text }]}>
-            {hospital.name}
-          </Text>
-          <Text style={[styles.hospitalAddress, { color: colors.text }]}>
-            {hospital.address}
-          </Text>
-          <View style={styles.ratingContainer}>
-            <Text style={[styles.ratingText, { color: colors.text }]}>
-              ⭐ {hospital.rating}/5
-            </Text>
-            <Text style={[styles.distanceText, { color: colors.tint }]}>
-              📍 {hospital.distance}
-            </Text>
-          </View>
-        </View>
-        <View
-          style={[
-            styles.statusBadge,
-            {
-              backgroundColor: hospital.isOpen ? "#4CAF50" : "#F44336",
-            },
-          ]}
-        >
-          <Text style={styles.statusText}>
-            {hospital.isOpen ? "OPEN" : "CLOSED"}
-          </Text>
-        </View>
-      </View>
-
-      <View style={styles.specialtiesContainer}>
-        {hospital.specialties.map((specialty, index) => (
-          <View
-            key={index}
-            style={[styles.specialtyBadge, { backgroundColor: colors.tint }]}
-          >
-            <Text style={styles.specialtyText}>{specialty}</Text>
-          </View>
-        ))}
-      </View>
-
-      <View style={styles.actionButtons}>
-        <TouchableOpacity
-          style={[styles.actionButton, { backgroundColor: colors.tint }]}
-          onPress={() => handleCallHospital(hospital.phone)}
-        >
-          <Text style={styles.actionButtonText}>📞 Call</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[
-            styles.actionButton,
-            { backgroundColor: colors.card, borderColor: colors.tint },
-          ]}
-          onPress={() => handleGetDirections(hospital)}
-        >
-          <Text style={[styles.actionButtonText, { color: colors.tint }]}>
-            🗺️ Directions
-          </Text>
-        </TouchableOpacity>
-      </View>
-    </View>
-  );
-
-  if (isLoading) {
-    return (
-      <View style={[styles.container, { backgroundColor: colors.background }]}>
-        <View style={styles.header}>
-          <Text style={[styles.title, { color: colors.text }]}>
-            Nearby Hospitals
-          </Text>
-          <Text style={[styles.subtitle, { color: colors.text }]}>
-            Finding medical facilities near you...
-          </Text>
-        </View>
-      </View>
-    );
-  }
-
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <ScrollView
-        style={styles.scrollView}
-        showsVerticalScrollIndicator={false}
-      >
+      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         {/* Header */}
         <View style={styles.header}>
-          <Text style={[styles.title, { color: colors.text }]}>
-            Nearby Hospitals
+          <Text style={[styles.greeting, { color: colors.text }]}>
+            Welcome back, Sarah!
           </Text>
           <Text style={[styles.subtitle, { color: colors.text }]}>
-            Medical facilities in your area
+            Track your recovery progress and stay healthy
           </Text>
         </View>
 
-        {/* Emergency Button */}
-        <TouchableOpacity
-          style={[styles.emergencyButton, { backgroundColor: "#F44336" }]}
-          onPress={handleEmergencyCall}
-        >
-          <Text style={styles.emergencyButtonText}>
-            🚨 EMERGENCY - Call 911
-          </Text>
-        </TouchableOpacity>
-
-        {/* Hospitals List */}
-        <View style={styles.hospitalsContainer}>
-          {nearbyHospitals.map(renderHospitalCard)}
+        {/* Navigation Tabs */}
+        <View style={styles.tabs}>
+          <Link href="/" asChild>
+            <TouchableOpacity style={styles.tab}>
+              <Text style={styles.tabText}>Overview</Text>
+            </TouchableOpacity>
+          </Link>
+          <Link href="/capture" asChild>
+            <TouchableOpacity style={styles.tab}>
+              <Text style={styles.tabText}>Capture</Text>
+            </TouchableOpacity>
+          </Link>
+          <Link href="/history" asChild>
+            <TouchableOpacity style={styles.tab}>
+              <Text style={styles.tabText}>History</Text>
+            </TouchableOpacity>
+          </Link>
+          <TouchableOpacity style={[styles.tab, styles.activeTab]}>
+            <Text style={styles.activeTabText}>Hospitals</Text>
+          </TouchableOpacity>
         </View>
 
-        {/* Additional Resources */}
-        <View style={[styles.resourcesCard, { backgroundColor: colors.card }]}>
-          <Text style={[styles.resourcesTitle, { color: colors.text }]}>
-            Additional Resources
+        {/* Find Nearby Hospitals Section */}
+        <View style={styles.findSection}>
+          <Text style={styles.findTitle}>Find Nearby Hospitals</Text>
+          <Text style={styles.findSubtitle}>
+            Locate medical facilities near you for immediate care
           </Text>
 
-          <TouchableOpacity style={styles.resourceItem}>
-            <Text style={[styles.resourceText, { color: colors.text }]}>
-              📋 Find a Wound Care Specialist
-            </Text>
-          </TouchableOpacity>
+          <View style={styles.searchContainer}>
+            <View style={styles.searchInputContainer}>
+              <Ionicons name="search" size={20} color="#64748B" />
+              <TextInput
+                style={styles.searchInput}
+                placeholder="Search hospitals..."
+                placeholderTextColor="#64748B"
+              />
+            </View>
+            <TouchableOpacity style={styles.locationButton}>
+              <Text style={styles.locationButtonText}>Use My Location</Text>
+            </TouchableOpacity>
+          </View>
 
-          <TouchableOpacity style={styles.resourceItem}>
-            <Text style={[styles.resourceText, { color: colors.text }]}>
-              💊 Local Pharmacies
-            </Text>
-          </TouchableOpacity>
+          <View style={styles.currentLocation}>
+            <Ionicons name="location" size={16} color="#3B82F6" />
+            <Text style={styles.locationText}>Downtown Area, Main Street</Text>
+          </View>
+        </View>
 
-          <TouchableOpacity style={styles.resourceItem}>
-            <Text style={[styles.resourceText, { color: colors.text }]}>
-              📞 Telemedicine Services
-            </Text>
-          </TouchableOpacity>
+        {/* Hospital List */}
+        <View style={styles.hospitalList}>
+          {hospitals.map((hospital, index) => (
+            <View key={index} style={styles.hospitalCard}>
+              <View style={styles.hospitalHeader}>
+                <View style={styles.hospitalInfo}>
+                  <Text style={styles.hospitalName}>{hospital.name}</Text>
+                  <View style={styles.ratingContainer}>
+                    <View style={styles.stars}>
+                      {[...Array(5)].map((_, i) => (
+                        <Ionicons
+                          key={i}
+                          name={i < Math.floor(hospital.rating) ? "star" : "star-outline"}
+                          size={16}
+                          color="#F59E0B"
+                        />
+                      ))}
+                    </View>
+                    <Text style={styles.rating}>({hospital.rating})</Text>
+                  </View>
+                </View>
+                <Text style={styles.distance}>{hospital.distance} miles away</Text>
+              </View>
+
+              <View style={styles.contactInfo}>
+                <View style={styles.infoRow}>
+                  <Ionicons name="location" size={16} color="#64748B" />
+                  <Text style={styles.infoText}>{hospital.address}</Text>
+                </View>
+                <View style={styles.infoRow}>
+                  <Ionicons name="call" size={16} color="#64748B" />
+                  <Text style={styles.infoText}>{hospital.phone}</Text>
+                </View>
+                <View style={styles.infoRow}>
+                  <Ionicons name="time" size={16} color="#64748B" />
+                  <Text style={styles.infoText}>{hospital.hours}</Text>
+                </View>
+              </View>
+
+              <Text style={styles.waitTime}>Wait Time: {hospital.waitTime}</Text>
+
+              <View style={styles.specialties}>
+                <Text style={styles.specialtiesTitle}>Specialties:</Text>
+                <View style={styles.specialtiesTags}>
+                  {hospital.specialties.map((specialty, i) => (
+                    <View key={i} style={styles.specialtyTag}>
+                      <Text style={styles.specialtyText}>{specialty}</Text>
+                    </View>
+                  ))}
+                </View>
+              </View>
+
+              <View style={styles.actions}>
+                <TouchableOpacity style={styles.actionButton}>
+                  <Ionicons name="navigate" size={20} color="#3B82F6" />
+                  <Text style={styles.actionButtonText}>Get Directions</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.actionButton}>
+                  <Ionicons name="call" size={20} color="#3B82F6" />
+                  <Text style={styles.actionButtonText}>Call</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          ))}
         </View>
       </ScrollView>
     </View>
@@ -263,149 +177,196 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     flex: 1,
-    padding: 20,
   },
   header: {
-    marginBottom: 30,
-    paddingTop: 60,
+    padding: 20,
+    paddingTop: 40,
   },
-  title: {
-    fontSize: 28,
+  greeting: {
+    fontSize: 24,
     fontWeight: "bold",
-    marginBottom: 10,
+    marginBottom: 8,
   },
   subtitle: {
     fontSize: 16,
-    opacity: 0.8,
+    opacity: 0.7,
   },
-  emergencyButton: {
-    paddingVertical: 16,
-    paddingHorizontal: 24,
-    borderRadius: 12,
+  tabs: {
+    flexDirection: "row",
+    paddingHorizontal: 20,
+    marginBottom: 20,
+  },
+  tab: {
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    marginRight: 10,
+  },
+  activeTab: {
+    backgroundColor: "#EEF2FF",
+    borderRadius: 20,
+  },
+  tabText: {
+    color: "#64748B",
+  },
+  activeTabText: {
+    color: "#3B82F6",
+    fontWeight: "500",
+  },
+  findSection: {
+    padding: 20,
+  },
+  findTitle: {
+    fontSize: 20,
+    fontWeight: "600",
+    color: "#1E293B",
+    marginBottom: 8,
+  },
+  findSubtitle: {
+    fontSize: 16,
+    color: "#64748B",
+    marginBottom: 20,
+  },
+  searchContainer: {
+    flexDirection: "row",
+    gap: 12,
+    marginBottom: 16,
+  },
+  searchInputContainer: {
+    flex: 1,
+    flexDirection: "row",
     alignItems: "center",
-    marginBottom: 30,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
+    backgroundColor: "white",
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
   },
-  emergencyButtonText: {
+  searchInput: {
+    flex: 1,
+    marginLeft: 8,
+    fontSize: 16,
+    color: "#1E293B",
+  },
+  locationButton: {
+    backgroundColor: "#3B82F6",
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    justifyContent: "center",
+  },
+  locationButtonText: {
     color: "white",
-    fontSize: 18,
-    fontWeight: "bold",
+    fontSize: 14,
+    fontWeight: "500",
   },
-  hospitalsContainer: {
-    marginBottom: 30,
+  currentLocation: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#F8FAFC",
+    padding: 12,
+    borderRadius: 12,
+  },
+  locationText: {
+    marginLeft: 8,
+    fontSize: 14,
+    color: "#1E293B",
+  },
+  hospitalList: {
+    padding: 20,
   },
   hospitalCard: {
+    backgroundColor: "white",
     borderRadius: 16,
-    padding: 20,
-    marginBottom: 20,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 3.84,
-    elevation: 5,
+    padding: 16,
+    marginBottom: 16,
   },
   hospitalHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "flex-start",
-    marginBottom: 15,
+    marginBottom: 12,
   },
   hospitalInfo: {
     flex: 1,
-    marginRight: 15,
   },
   hospitalName: {
     fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 5,
-  },
-  hospitalAddress: {
-    fontSize: 14,
-    opacity: 0.8,
-    marginBottom: 8,
+    fontWeight: "600",
+    color: "#1E293B",
+    marginBottom: 4,
   },
   ratingContainer: {
     flexDirection: "row",
-    justifyContent: "space-between",
     alignItems: "center",
   },
-  ratingText: {
+  stars: {
+    flexDirection: "row",
+    marginRight: 4,
+  },
+  rating: {
     fontSize: 14,
-    fontWeight: "600",
+    color: "#64748B",
   },
-  distanceText: {
+  distance: {
     fontSize: 14,
-    fontWeight: "600",
+    color: "#64748B",
   },
-  statusBadge: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 20,
+  contactInfo: {
+    marginBottom: 12,
   },
-  statusText: {
-    color: "white",
-    fontSize: 12,
-    fontWeight: "600",
+  infoRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 8,
   },
-  specialtiesContainer: {
+  infoText: {
+    marginLeft: 8,
+    fontSize: 14,
+    color: "#1E293B",
+  },
+  waitTime: {
+    fontSize: 14,
+    color: "#1E293B",
+    marginBottom: 12,
+  },
+  specialties: {
+    marginBottom: 16,
+  },
+  specialtiesTitle: {
+    fontSize: 14,
+    color: "#64748B",
+    marginBottom: 8,
+  },
+  specialtiesTags: {
     flexDirection: "row",
     flexWrap: "wrap",
-    marginBottom: 15,
     gap: 8,
   },
-  specialtyBadge: {
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 12,
+  specialtyTag: {
+    backgroundColor: "#F1F5F9",
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
   },
   specialtyText: {
-    color: "white",
-    fontSize: 12,
-    fontWeight: "600",
+    fontSize: 14,
+    color: "#1E293B",
   },
-  actionButtons: {
+  actions: {
     flexDirection: "row",
     gap: 12,
   },
   actionButton: {
     flex: 1,
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 8,
+    flexDirection: "row",
     alignItems: "center",
-    borderWidth: 1,
+    justifyContent: "center",
+    backgroundColor: "#F8FAFC",
+    padding: 12,
+    borderRadius: 12,
   },
   actionButtonText: {
+    marginLeft: 8,
     fontSize: 14,
-    fontWeight: "600",
-    color: "white",
-  },
-  resourcesCard: {
-    borderRadius: 16,
-    padding: 20,
-    marginBottom: 30,
-  },
-  resourcesTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 15,
-  },
-  resourceItem: {
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: "#E0E0E0",
-  },
-  resourceText: {
-    fontSize: 16,
+    fontWeight: "500",
+    color: "#3B82F6",
   },
 });

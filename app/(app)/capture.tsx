@@ -1,9 +1,9 @@
 import { Colors } from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
-import React, { useState } from "react";
+import { Ionicons } from "@expo/vector-icons";
+import { Link } from "expo-router";
+import React from "react";
 import {
-  Alert,
-  Image,
   ScrollView,
   StyleSheet,
   Text,
@@ -11,218 +11,91 @@ import {
   View,
 } from "react-native";
 
-interface WoundPhoto {
-  id: string;
-  uri: string;
-  date: string;
-  analysis: string;
-  severity: "low" | "medium" | "high";
-}
-
 export default function CaptureScreen() {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? "light"];
-  const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
-
-  // Mock recent photos - in real app, this would come from storage/API
-  const recentPhotos: WoundPhoto[] = [
-    {
-      id: "1",
-      uri: "https://via.placeholder.com/300x200/FF6B6B/FFFFFF?text=Wound+Photo+1",
-      date: "2024-01-15",
-      analysis: "Healing well, no signs of infection",
-      severity: "low",
-    },
-    {
-      id: "2",
-      uri: "https://via.placeholder.com/300x200/4ECDC4/FFFFFF?text=Wound+Photo+2",
-      date: "2024-01-12",
-      analysis: "Minor inflammation detected",
-      severity: "medium",
-    },
-  ];
-
-  const handleTakePhoto = () => {
-    // TODO: Implement camera functionality
-    Alert.alert(
-      "Camera",
-      "Camera functionality will be implemented with expo-camera"
-    );
-  };
-
-  const handleSelectFromGallery = () => {
-    // TODO: Implement gallery picker
-    Alert.alert(
-      "Gallery",
-      "Gallery picker will be implemented with expo-image-picker"
-    );
-  };
-
-  const handleAnalyzePhoto = async () => {
-    if (!selectedPhoto) {
-      Alert.alert("Error", "Please select a photo first");
-      return;
-    }
-
-    setIsAnalyzing(true);
-
-    // Simulate AI analysis
-    setTimeout(() => {
-      setIsAnalyzing(false);
-      Alert.alert(
-        "Analysis Complete",
-        "No signs of infection detected. Continue monitoring.",
-        [
-          { text: "OK" },
-          {
-            text: "View Details",
-            onPress: () => console.log("Navigate to analysis details"),
-          },
-        ]
-      );
-    }, 3000);
-  };
-
-  const getSeverityColor = (severity: string) => {
-    switch (severity) {
-      case "low":
-        return "#4CAF50";
-      case "medium":
-        return "#FF9800";
-      case "high":
-        return "#F44336";
-      default:
-        return "#4CAF50";
-    }
-  };
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <ScrollView
-        style={styles.scrollView}
-        showsVerticalScrollIndicator={false}
-      >
+      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         {/* Header */}
         <View style={styles.header}>
-          <Text style={[styles.title, { color: colors.text }]}>
-            Capture Wound Photo
+          <Text style={[styles.greeting, { color: colors.text }]}>
+            Welcome back, Sarah!
           </Text>
           <Text style={[styles.subtitle, { color: colors.text }]}>
-            Take a photo or select from gallery for AI analysis
+            Track your recovery progress and stay healthy
           </Text>
         </View>
 
-        {/* Capture Options */}
+        {/* Navigation Tabs */}
+        <View style={styles.tabs}>
+          <Link href="/" asChild>
+            <TouchableOpacity style={styles.tab}>
+              <Text style={styles.tabText}>Overview</Text>
+            </TouchableOpacity>
+          </Link>
+          <TouchableOpacity style={[styles.tab, styles.activeTab]}>
+            <Text style={styles.activeTabText}>Capture</Text>
+          </TouchableOpacity>
+          <Link href="/history" asChild>
+            <TouchableOpacity style={styles.tab}>
+              <Text style={styles.tabText}>History</Text>
+            </TouchableOpacity>
+          </Link>
+          <Link href="/hospitals" asChild>
+            <TouchableOpacity style={styles.tab}>
+              <Text style={styles.tabText}>Hospitals</Text>
+            </TouchableOpacity>
+          </Link>
+        </View>
+
+        {/* Capture Section */}
         <View style={styles.captureSection}>
-          <View style={styles.captureButtons}>
-            <TouchableOpacity
-              style={[styles.captureButton, { backgroundColor: colors.tint }]}
-              onPress={handleTakePhoto}
-            >
-              <Text style={styles.captureButtonText}>📸 Take Photo</Text>
+          <Text style={styles.sectionTitle}>Wound Photo Capture</Text>
+          <Text style={styles.sectionSubtitle}>
+            Take or upload a photo of your C-section wound for  analysis
+          </Text>
+
+          <View style={styles.captureBox}>
+            <View style={styles.cameraIcon}>
+              <Ionicons name="camera" size={32} color="#3B82F6" />
+            </View>
+            <Text style={styles.captureTitle}>Capture Wound Photo</Text>
+            <Text style={styles.captureSubtitle}>
+              Take a clear photo of your wound for analysis
+            </Text>
+
+            <TouchableOpacity style={styles.actionButton}>
+              <Text style={styles.actionButtonText}>Take Photo</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity
-              style={[
-                styles.captureButton,
-                { backgroundColor: colors.card, borderColor: colors.tint },
-              ]}
-              onPress={handleSelectFromGallery}
-            >
-              <Text style={[styles.captureButtonText, { color: colors.tint }]}>
-                🖼️ From Gallery
-              </Text>
+            <Text style={styles.orText}>or</Text>
+
+            <TouchableOpacity style={styles.uploadButton}>
+              <Text style={styles.uploadButtonText}>Upload from Gallery</Text>
             </TouchableOpacity>
           </View>
         </View>
 
-        {/* Selected Photo Preview */}
-        {selectedPhoto && (
-          <View style={[styles.previewCard, { backgroundColor: colors.card }]}>
-            <Text style={[styles.previewTitle, { color: colors.text }]}>
-              Selected Photo
-            </Text>
-            <Image
-              source={{ uri: selectedPhoto }}
-              style={styles.previewImage}
-            />
-            <TouchableOpacity
-              style={[styles.analyzeButton, { backgroundColor: colors.tint }]}
-              onPress={handleAnalyzePhoto}
-              disabled={isAnalyzing}
-            >
-              <Text style={styles.analyzeButtonText}>
-                {isAnalyzing ? "Analyzing..." : "🔍 Analyze Photo"}
-              </Text>
-            </TouchableOpacity>
-          </View>
-        )}
-
-        {/* Recent Photos */}
-        <View style={styles.recentSection}>
-          <Text style={[styles.sectionTitle, { color: colors.text }]}>
-            Recent Photos
-          </Text>
-          {recentPhotos.map((photo) => (
-            <TouchableOpacity
-              key={photo.id}
-              style={[styles.photoCard, { backgroundColor: colors.card }]}
-              onPress={() => setSelectedPhoto(photo.uri)}
-            >
-              <Image
-                source={{ uri: photo.uri }}
-                style={styles.photoThumbnail}
-              />
-              <View style={styles.photoInfo}>
-                <Text style={[styles.photoDate, { color: colors.text }]}>
-                  {photo.date}
-                </Text>
-                <Text
-                  style={[styles.photoAnalysis, { color: colors.text }]}
-                  numberOfLines={2}
-                >
-                  {photo.analysis}
-                </Text>
-                <View
-                  style={[
-                    styles.severityBadge,
-                    { backgroundColor: getSeverityColor(photo.severity) },
-                  ]}
-                >
-                  <Text style={styles.severityText}>
-                    {photo.severity.toUpperCase()}
-                  </Text>
-                </View>
-              </View>
-            </TouchableOpacity>
-          ))}
-        </View>
-
-        {/* Tips */}
-        <View style={[styles.tipsCard, { backgroundColor: colors.card }]}>
-          <Text style={[styles.tipsTitle, { color: colors.text }]}>
-            📋 Photo Tips
-          </Text>
+        {/* Tips Section */}
+        <View style={styles.tipsSection}>
+          <Text style={styles.tipsTitle}>Photo Tips</Text>
           <View style={styles.tipItem}>
-            <Text style={[styles.tipText, { color: colors.text }]}>
-              • Ensure good lighting for clear photos
-            </Text>
+            <Ionicons name="checkmark-circle" size={24} color="#22C55E" />
+            <Text style={styles.tipText}>Ensure good lighting</Text>
           </View>
           <View style={styles.tipItem}>
-            <Text style={[styles.tipText, { color: colors.text }]}>
-              • Keep the camera steady and close to the wound
-            </Text>
+            <Ionicons name="checkmark-circle" size={24} color="#22C55E" />
+            <Text style={styles.tipText}>Keep the camera steady</Text>
           </View>
           <View style={styles.tipItem}>
-            <Text style={[styles.tipText, { color: colors.text }]}>
-              • Take photos from the same angle for consistency
-            </Text>
+            <Ionicons name="checkmark-circle" size={24} color="#22C55E" />
+            <Text style={styles.tipText}>Center the wound in frame</Text>
           </View>
           <View style={styles.tipItem}>
-            <Text style={[styles.tipText, { color: colors.text }]}>
-              • Clean the area around the wound before taking photos
-            </Text>
+            <Ionicons name="checkmark-circle" size={24} color="#22C55E" />
+            <Text style={styles.tipText}>Maintain a consistent distance</Text>
           </View>
         </View>
       </ScrollView>
@@ -236,135 +109,133 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     flex: 1,
-    padding: 20,
   },
   header: {
-    marginBottom: 30,
-    paddingTop: 60,
+    padding: 20,
+    paddingTop: 40,
   },
-  title: {
-    fontSize: 28,
+  greeting: {
+    fontSize: 24,
     fontWeight: "bold",
-    marginBottom: 10,
+    marginBottom: 8,
   },
   subtitle: {
     fontSize: 16,
-    opacity: 0.8,
-    lineHeight: 24,
+    opacity: 0.7,
+  },
+  tabs: {
+    flexDirection: "row",
+    paddingHorizontal: 20,
+    marginBottom: 20,
+  },
+  tab: {
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    marginRight: 10,
+  },
+  activeTab: {
+    backgroundColor: "#EEF2FF",
+    borderRadius: 20,
+  },
+  tabText: {
+    color: "#64748B",
+  },
+  activeTabText: {
+    color: "#3B82F6",
+    fontWeight: "500",
   },
   captureSection: {
-    marginBottom: 30,
+    padding: 20,
   },
-  captureButtons: {
-    gap: 15,
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: "600",
+    color: "#1E293B",
+    marginBottom: 8,
   },
-  captureButton: {
-    paddingVertical: 18,
-    paddingHorizontal: 24,
-    borderRadius: 12,
+  sectionSubtitle: {
+    fontSize: 16,
+    color: "#64748B",
+    marginBottom: 24,
+  },
+  captureBox: {
+    backgroundColor: "white",
+    borderRadius: 16,
+    padding: 24,
     alignItems: "center",
-    borderWidth: 1,
+    borderWidth: 2,
+    borderColor: "#E2E8F0",
+    borderStyle: "dashed",
   },
-  captureButtonText: {
+  cameraIcon: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: "#EEF2FF",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 16,
+  },
+  captureTitle: {
     fontSize: 18,
     fontWeight: "600",
-    color: "white",
+    color: "#1E293B",
+    marginBottom: 8,
   },
-  previewCard: {
-    borderRadius: 16,
-    padding: 20,
-    marginBottom: 30,
+  captureSubtitle: {
+    fontSize: 14,
+    color: "#64748B",
+    textAlign: "center",
+    marginBottom: 24,
+  },
+  actionButton: {
+    backgroundColor: "#3B82F6",
+    paddingVertical: 16,
+    paddingHorizontal: 32,
+    borderRadius: 12,
+    width: "100%",
     alignItems: "center",
   },
-  previewTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 15,
-  },
-  previewImage: {
-    width: 200,
-    height: 150,
-    borderRadius: 12,
-    marginBottom: 15,
-  },
-  analyzeButton: {
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    borderRadius: 8,
-  },
-  analyzeButtonText: {
+  actionButtonText: {
     color: "white",
     fontSize: 16,
     fontWeight: "600",
   },
-  recentSection: {
-    marginBottom: 30,
-  },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    marginBottom: 15,
-  },
-  photoCard: {
-    flexDirection: "row",
-    borderRadius: 12,
-    padding: 15,
-    marginBottom: 15,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-  photoThumbnail: {
-    width: 80,
-    height: 60,
-    borderRadius: 8,
-    marginRight: 15,
-  },
-  photoInfo: {
-    flex: 1,
-    justifyContent: "space-between",
-  },
-  photoDate: {
+  orText: {
+    color: "#64748B",
     fontSize: 14,
-    fontWeight: "600",
-    marginBottom: 5,
+    marginVertical: 16,
   },
-  photoAnalysis: {
-    fontSize: 14,
-    opacity: 0.8,
-    marginBottom: 8,
-  },
-  severityBadge: {
-    alignSelf: "flex-start",
-    paddingHorizontal: 8,
-    paddingVertical: 4,
+  uploadButton: {
+    backgroundColor: "#F8FAFC",
+    paddingVertical: 16,
+    paddingHorizontal: 32,
     borderRadius: 12,
+    width: "100%",
+    alignItems: "center",
   },
-  severityText: {
-    color: "white",
-    fontSize: 12,
+  uploadButtonText: {
+    color: "#1E293B",
+    fontSize: 16,
     fontWeight: "600",
   },
-  tipsCard: {
-    borderRadius: 16,
+  tipsSection: {
     padding: 20,
-    marginBottom: 30,
   },
   tipsTitle: {
     fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 15,
+    fontWeight: "600",
+    color: "#1E293B",
+    marginBottom: 16,
   },
   tipItem: {
-    marginBottom: 8,
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 12,
   },
   tipText: {
-    fontSize: 14,
-    lineHeight: 20,
+    fontSize: 16,
+    color: "#1E293B",
+    marginLeft: 12,
   },
 });

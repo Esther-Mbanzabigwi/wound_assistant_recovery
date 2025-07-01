@@ -1,236 +1,264 @@
 import { Colors } from "@/constants/Colors";
 import { useAuth } from "@/contexts/AuthContext";
 import { useColorScheme } from "@/hooks/useColorScheme";
-import { Link, router } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
+import { Link } from "expo-router";
 import React, { useState } from "react";
 import {
-  Alert,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
+    KeyboardAvoidingView,
+    Platform,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from "react-native";
 
 export default function RegisterScreen() {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? "light"];
-  const { signUp, isLoading } = useAuth();
-
-  const [name, setName] = useState("");
+  const { signUp } = useAuth();
+  const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
-  const handleSignUp = async () => {
-    if (!name || !email || !password || !confirmPassword) {
-      Alert.alert("Error", "Please fill in all fields");
-      return;
-    }
-
-    if (password !== confirmPassword) {
-      Alert.alert("Error", "Passwords do not match");
-      return;
-    }
-
-    if (password.length < 6) {
-      Alert.alert("Error", "Password must be at least 6 characters");
-      return;
-    }
-
+  const handleRegister = async () => {
     try {
-      await signUp(email, password, name);
-      router.replace("/(app)");
+      await signUp({ fullName, email, phone, password });
     } catch (error) {
-      Alert.alert("Error", "Failed to create account");
+      console.error(error);
     }
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <View style={styles.content}>
-        <View style={styles.header}>
-          <Text style={[styles.title, { color: colors.text }]}>
-            Create Account
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={styles.container}
+    >
+      <ScrollView style={styles.scrollView}>
+        <Link href="/" style={styles.backButton}>
+          <View style={styles.backButtonContent}>
+            <Ionicons name="arrow-back" size={24} color="#3B82F6" />
+            <Text style={styles.backButtonText}>Back to Home</Text>
+          </View>
+        </Link>
+
+        <View style={styles.card}>
+          <View style={styles.logoContainer}>
+            <View style={styles.logo}>
+              <Ionicons name="heart" size={32} color="#3B82F6" />
+            </View>
+          </View>
+
+          <Text style={styles.title}>Join WoundTrack</Text>
+          <Text style={styles.subtitle}>
+            Create your account to start monitoring your recovery
           </Text>
-          <Text style={[styles.subtitle, { color: colors.text }]}>
-            Join us to start tracking your wound recovery
-          </Text>
-        </View>
 
-        <View style={styles.form}>
-          <View style={styles.inputContainer}>
-            <Text style={[styles.label, { color: colors.text }]}>
-              Full Name
-            </Text>
-            <TextInput
-              style={[
-                styles.input,
-                {
-                  backgroundColor: colors.card,
-                  color: colors.text,
-                  borderColor: colors.border,
-                },
-              ]}
-              value={name}
-              onChangeText={setName}
-              placeholder="Enter your full name"
-              placeholderTextColor={colors.tabIconDefault}
-              autoCapitalize="words"
-            />
-          </View>
+          <View style={styles.form}>
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>Full Name</Text>
+              <View style={styles.inputWrapper}>
+                <Ionicons name="person" size={20} color="#64748B" />
+                <TextInput
+                  style={styles.input}
+                  placeholder="Your full name"
+                  placeholderTextColor="#64748B"
+                  value={fullName}
+                  onChangeText={setFullName}
+                />
+              </View>
+            </View>
 
-          <View style={styles.inputContainer}>
-            <Text style={[styles.label, { color: colors.text }]}>Email</Text>
-            <TextInput
-              style={[
-                styles.input,
-                {
-                  backgroundColor: colors.card,
-                  color: colors.text,
-                  borderColor: colors.border,
-                },
-              ]}
-              value={email}
-              onChangeText={setEmail}
-              placeholder="Enter your email"
-              placeholderTextColor={colors.tabIconDefault}
-              keyboardType="email-address"
-              autoCapitalize="none"
-            />
-          </View>
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>Email</Text>
+              <View style={styles.inputWrapper}>
+                <Ionicons name="mail" size={20} color="#64748B" />
+                <TextInput
+                  style={styles.input}
+                  placeholder="your.email@example.com"
+                  placeholderTextColor="#64748B"
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  value={email}
+                  onChangeText={setEmail}
+                />
+              </View>
+            </View>
 
-          <View style={styles.inputContainer}>
-            <Text style={[styles.label, { color: colors.text }]}>Password</Text>
-            <TextInput
-              style={[
-                styles.input,
-                {
-                  backgroundColor: colors.card,
-                  color: colors.text,
-                  borderColor: colors.border,
-                },
-              ]}
-              value={password}
-              onChangeText={setPassword}
-              placeholder="Create a password"
-              placeholderTextColor={colors.tabIconDefault}
-              secureTextEntry
-            />
-          </View>
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>Phone Number</Text>
+              <View style={styles.inputWrapper}>
+                <Ionicons name="call" size={20} color="#64748B" />
+                <TextInput
+                  style={styles.input}
+                  placeholder="+1 (555) 000-0000"
+                  placeholderTextColor="#64748B"
+                  keyboardType="phone-pad"
+                  value={phone}
+                  onChangeText={setPhone}
+                />
+              </View>
+            </View>
 
-          <View style={styles.inputContainer}>
-            <Text style={[styles.label, { color: colors.text }]}>
-              Confirm Password
-            </Text>
-            <TextInput
-              style={[
-                styles.input,
-                {
-                  backgroundColor: colors.card,
-                  color: colors.text,
-                  borderColor: colors.border,
-                },
-              ]}
-              value={confirmPassword}
-              onChangeText={setConfirmPassword}
-              placeholder="Confirm your password"
-              placeholderTextColor={colors.tabIconDefault}
-              secureTextEntry
-            />
-          </View>
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>Password</Text>
+              <View style={styles.inputWrapper}>
+                <Ionicons name="lock-closed" size={20} color="#64748B" />
+                <TextInput
+                  style={styles.input}
+                  placeholder="••••••••"
+                  placeholderTextColor="#64748B"
+                  secureTextEntry
+                  value={password}
+                  onChangeText={setPassword}
+                />
+              </View>
+            </View>
 
-          <TouchableOpacity
-            style={[styles.button, { backgroundColor: colors.tint }]}
-            onPress={handleSignUp}
-            disabled={isLoading}
-          >
-            <Text style={styles.buttonText}>
-              {isLoading ? "Creating Account..." : "Create Account"}
-            </Text>
-          </TouchableOpacity>
-        </View>
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>Confirm Password</Text>
+              <View style={styles.inputWrapper}>
+                <Ionicons name="lock-closed" size={20} color="#64748B" />
+                <TextInput
+                  style={styles.input}
+                  placeholder="••••••••"
+                  placeholderTextColor="#64748B"
+                  secureTextEntry
+                  value={confirmPassword}
+                  onChangeText={setConfirmPassword}
+                />
+              </View>
+            </View>
 
-        <View style={styles.footer}>
-          <Text style={[styles.footerText, { color: colors.text }]}>
-            Already have an account?{" "}
-          </Text>
-          <Link href="/(auth)/login" asChild>
-            <TouchableOpacity>
-              <Text style={[styles.linkText, { color: colors.tint }]}>
-                Sign In
-              </Text>
+            <TouchableOpacity
+              style={styles.createAccountButton}
+              onPress={handleRegister}
+            >
+              <Text style={styles.createAccountButtonText}>Create Account</Text>
             </TouchableOpacity>
-          </Link>
+
+            <View style={styles.footer}>
+              <Text style={styles.footerText}>Already have an account? </Text>
+              <Link href="/login" asChild>
+                <TouchableOpacity>
+                  <Text style={styles.signInLink}>Sign in here</Text>
+                </TouchableOpacity>
+              </Link>
+            </View>
+          </View>
         </View>
-      </View>
-    </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "#F8FAFC",
   },
-  content: {
+  scrollView: {
     flex: 1,
+  },
+  backButton: {
     padding: 20,
+    paddingTop: 60,
+  },
+  backButtonContent: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  backButtonText: {
+    marginLeft: 8,
+    fontSize: 16,
+    color: "#3B82F6",
+  },
+  card: {
+    flex: 1,
+    backgroundColor: "white",
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    padding: 24,
+  },
+  logoContainer: {
+    alignItems: "center",
+    marginBottom: 24,
+  },
+  logo: {
+    width: 64,
+    height: 64,
+    borderRadius: 16,
+    backgroundColor: "#EEF2FF",
+    alignItems: "center",
     justifyContent: "center",
   },
-  header: {
-    alignItems: "center",
-    marginBottom: 40,
-  },
   title: {
-    fontSize: 28,
+    fontSize: 24,
     fontWeight: "bold",
-    marginBottom: 10,
+    color: "#1E293B",
+    textAlign: "center",
+    marginBottom: 8,
   },
   subtitle: {
     fontSize: 16,
-    opacity: 0.8,
+    color: "#64748B",
     textAlign: "center",
+    marginBottom: 32,
   },
   form: {
-    marginBottom: 30,
+    gap: 20,
   },
   inputContainer: {
-    marginBottom: 20,
+    gap: 8,
   },
   label: {
     fontSize: 16,
-    fontWeight: "600",
-    marginBottom: 8,
+    fontWeight: "500",
+    color: "#1E293B",
   },
-  input: {
-    borderWidth: 1,
+  inputWrapper: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#F8FAFC",
     borderRadius: 12,
     paddingHorizontal: 16,
-    paddingVertical: 14,
+    paddingVertical: 12,
+  },
+  input: {
+    flex: 1,
+    marginLeft: 12,
     fontSize: 16,
+    color: "#1E293B",
   },
-  button: {
-    paddingVertical: 16,
-    paddingHorizontal: 32,
+  createAccountButton: {
+    backgroundColor: "#3B82F6",
     borderRadius: 12,
+    paddingVertical: 16,
     alignItems: "center",
-    marginTop: 10,
+    marginTop: 8,
   },
-  buttonText: {
+  createAccountButtonText: {
     color: "white",
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: "600",
   },
   footer: {
     flexDirection: "row",
     justifyContent: "center",
-    alignItems: "center",
+    marginTop: 16,
+    marginBottom: 24,
   },
   footerText: {
-    fontSize: 16,
+    fontSize: 14,
+    color: "#64748B",
   },
-  linkText: {
-    fontSize: 16,
-    fontWeight: "600",
+  signInLink: {
+    fontSize: 14,
+    color: "#3B82F6",
+    fontWeight: "500",
   },
 });

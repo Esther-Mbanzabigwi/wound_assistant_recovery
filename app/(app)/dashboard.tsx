@@ -1,9 +1,9 @@
 import { Colors } from "@/constants/Colors";
 import { useAuth } from "@/contexts/AuthContext";
 import { useColorScheme } from "@/hooks/useColorScheme";
+import { Link } from "expo-router";
 import React from "react";
 import {
-  Alert,
   ScrollView,
   StyleSheet,
   Text,
@@ -11,175 +11,123 @@ import {
   View,
 } from "react-native";
 
-interface RecoveryData {
-  totalPhotos: number;
-  lastPhotoDate: string;
-  recoveryProgress: number;
-  daysSinceInjury: number;
-  nextCheckup: string;
-}
-
 export default function DashboardScreen() {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? "light"];
-  const { user, signOut } = useAuth();
-
-  // Mock data - in real app, this would come from API/database
-  const recoveryData: RecoveryData = {
-    totalPhotos: 12,
-    lastPhotoDate: "2024-01-15",
-    recoveryProgress: 75,
-    daysSinceInjury: 14,
-    nextCheckup: "2024-01-20",
-  };
-
-  const handleSignOut = async () => {
-    try {
-      await signOut();
-    } catch (error) {
-      Alert.alert("Error", "Failed to sign out");
-    }
-  };
-
-  const getProgressColor = (progress: number) => {
-    if (progress >= 80) return "#4CAF50";
-    if (progress >= 60) return "#FF9800";
-    return "#F44336";
-  };
+  const { user } = useAuth();
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <ScrollView
-        style={styles.scrollView}
-        showsVerticalScrollIndicator={false}
-      >
+      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         {/* Header */}
         <View style={styles.header}>
-          <View>
-            <Text style={[styles.greeting, { color: colors.text }]}>
-              Welcome back, {user?.name || "User"}!
-            </Text>
-            <Text style={[styles.subtitle, { color: colors.text }]}>
-              Track your wound recovery progress
-            </Text>
-          </View>
-          <TouchableOpacity onPress={handleSignOut}>
-            <Text style={[styles.signOutText, { color: colors.tint }]}>
-              Sign Out
-            </Text>
+          <Text style={[styles.greeting, { color: colors.text }]}>
+            Welcome back, {user?.name || "Sarah"}!
+          </Text>
+          <Text style={[styles.subtitle, { color: colors.text }]}>
+            Track your recovery progress and stay healthy
+          </Text>
+        </View>
+
+        {/* Navigation Tabs */}
+        <View style={styles.tabs}>
+          <TouchableOpacity style={[styles.tab, styles.activeTab]}>
+            <Text style={styles.activeTabText}>Overview</Text>
           </TouchableOpacity>
+          <Link href="/capture" asChild>
+            <TouchableOpacity style={styles.tab}>
+              <Text style={styles.tabText}>Capture</Text>
+            </TouchableOpacity>
+          </Link>
+          <Link href="/history" asChild>
+            <TouchableOpacity style={styles.tab}>
+              <Text style={styles.tabText}>History</Text>
+            </TouchableOpacity>
+          </Link>
+          <Link href="/hospitals" asChild>
+            <TouchableOpacity style={styles.tab}>
+              <Text style={styles.tabText}>Hospitals</Text>
+            </TouchableOpacity>
+          </Link>
         </View>
 
-        {/* Recovery Progress Card */}
-        <View style={[styles.card, { backgroundColor: colors.card }]}>
-          <Text style={[styles.cardTitle, { color: colors.text }]}>
-            Recovery Progress
-          </Text>
-          <View style={styles.progressContainer}>
-            <View style={styles.progressBar}>
-              <View
-                style={[
-                  styles.progressFill,
-                  {
-                    width: `${recoveryData.recoveryProgress}%`,
-                    backgroundColor: getProgressColor(
-                      recoveryData.recoveryProgress
-                    ),
-                  },
-                ]}
-              />
-            </View>
-            <Text style={[styles.progressText, { color: colors.text }]}>
-              {recoveryData.recoveryProgress}% Complete
-            </Text>
-          </View>
-        </View>
-
-        {/* Quick Stats */}
-        <View style={styles.statsContainer}>
-          <View style={[styles.statCard, { backgroundColor: colors.card }]}>
-            <Text style={[styles.statNumber, { color: colors.tint }]}>
-              {recoveryData.totalPhotos}
-            </Text>
-            <Text style={[styles.statLabel, { color: colors.text }]}>
-              Photos Taken
-            </Text>
-          </View>
-          <View style={[styles.statCard, { backgroundColor: colors.card }]}>
-            <Text style={[styles.statNumber, { color: colors.tint }]}>
-              {recoveryData.daysSinceInjury}
-            </Text>
-            <Text style={[styles.statLabel, { color: colors.text }]}>
-              Days Since Injury
-            </Text>
-          </View>
-        </View>
-
-        {/* Recent Activity */}
-        <View style={[styles.card, { backgroundColor: colors.card }]}>
-          <Text style={[styles.cardTitle, { color: colors.text }]}>
-            Recent Activity
-          </Text>
-          <View style={styles.activityItem}>
-            <Text style={[styles.activityIcon, { color: colors.tint }]}>
-              📸
-            </Text>
-            <View style={styles.activityContent}>
-              <Text style={[styles.activityTitle, { color: colors.text }]}>
-                Photo Captured
-              </Text>
-              <Text style={[styles.activityTime, { color: colors.text }]}>
-                {recoveryData.lastPhotoDate}
-              </Text>
+        {/* Recovery Status */}
+        <View style={[styles.card, styles.statusCard]}>
+          <View style={styles.statusHeader}>
+            <Text style={styles.cardTitle}>Recovery Status</Text>
+            <View style={styles.statusBadge}>
+              <Text style={styles.statusText}>Healthy</Text>
             </View>
           </View>
-          <View style={styles.activityItem}>
-            <Text style={[styles.activityIcon, { color: colors.tint }]}>
-              ✅
-            </Text>
-            <View style={styles.activityContent}>
-              <Text style={[styles.activityTitle, { color: colors.text }]}>
-                Analysis Complete
-              </Text>
-              <Text style={[styles.activityTime, { color: colors.text }]}>
-                No infection detected
-              </Text>
-            </View>
-          </View>
+          <Text style={styles.lastChecked}>Last checked 2 hours ago</Text>
         </View>
 
-        {/* Next Checkup */}
-        <View style={[styles.card, { backgroundColor: colors.card }]}>
-          <Text style={[styles.cardTitle, { color: colors.text }]}>
-            Next Checkup
-          </Text>
-          <View style={styles.checkupContainer}>
-            <Text style={[styles.checkupDate, { color: colors.tint }]}>
-              {recoveryData.nextCheckup}
-            </Text>
-            <Text style={[styles.checkupText, { color: colors.text }]}>
-              Remember to take a new photo for comparison
-            </Text>
+        {/* Stats Cards */}
+        <View style={styles.statsGrid}>
+          <View style={[styles.card, styles.statCard]}>
+            <Text style={styles.statTitle}>Days Since Surgery</Text>
+            <Text style={styles.statValue}>12</Text>
+            <Text style={styles.statSubtext}>Recovery on track</Text>
+          </View>
+          <View style={[styles.card, styles.statCard]}>
+            <Text style={styles.statTitle}>Photos Taken</Text>
+            <Text style={styles.statValue}>8</Text>
+            <Text style={styles.statSubtext}>Last photo today</Text>
           </View>
         </View>
 
         {/* Quick Actions */}
         <View style={styles.quickActions}>
-          <TouchableOpacity
-            style={[styles.actionButton, { backgroundColor: colors.tint }]}
-          >
-            <Text style={styles.actionButtonText}>📸 Take New Photo</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[
-              styles.actionButton,
-              { backgroundColor: colors.card, borderColor: colors.tint },
-            ]}
-          >
-            <Text style={[styles.actionButtonText, { color: colors.tint }]}>
-              📊 View History
-            </Text>
-          </TouchableOpacity>
+          <Text style={styles.sectionTitle}>Quick Actions</Text>
+          <Text style={styles.sectionSubtitle}>Common tasks for your recovery tracking</Text>
+          
+          <Link href="/capture" asChild>
+            <TouchableOpacity style={styles.actionButton}>
+              <Text style={styles.actionButtonText}>Take New Photo</Text>
+            </TouchableOpacity>
+          </Link>
+          
+          <Link href="/history" asChild>
+            <TouchableOpacity style={styles.actionButtonSecondary}>
+              <Text style={styles.actionButtonTextSecondary}>View History</Text>
+            </TouchableOpacity>
+          </Link>
+          
+          <Link href="/hospitals" asChild>
+            <TouchableOpacity style={styles.actionButtonSecondary}>
+              <Text style={styles.actionButtonTextSecondary}>Find Hospitals</Text>
+            </TouchableOpacity>
+          </Link>
+        </View>
+
+        {/* Recent Activity */}
+        <View style={styles.recentActivity}>
+          <Text style={styles.sectionTitle}>Recent Activity</Text>
+          <Text style={styles.sectionSubtitle}>Your latest wound assessments</Text>
+          
+          <View style={styles.activityItem}>
+            <View style={styles.activityDot} />
+            <View style={styles.activityContent}>
+              <Text style={styles.activityTitle}>Wound assessment - Healthy</Text>
+              <Text style={styles.activityTime}>2 hours ago</Text>
+            </View>
+          </View>
+
+          <View style={styles.activityItem}>
+            <View style={styles.activityDot} />
+            <View style={styles.activityContent}>
+              <Text style={styles.activityTitle}>Photo captured</Text>
+              <Text style={styles.activityTime}>2 hours ago</Text>
+            </View>
+          </View>
+
+          <View style={styles.activityItem}>
+            <View style={styles.activityDot} />
+            <View style={styles.activityContent}>
+              <Text style={styles.activityTitle}>Wound assessment - Healthy</Text>
+              <Text style={styles.activityTime}>1 day ago</Text>
+            </View>
+          </View>
         </View>
       </ScrollView>
     </View>
@@ -192,140 +140,169 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     flex: 1,
-    padding: 20,
   },
   header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 30,
-    paddingTop: 60,
+    padding: 20,
+    paddingTop: 40,
   },
   greeting: {
     fontSize: 24,
     fontWeight: "bold",
-    marginBottom: 5,
+    marginBottom: 8,
   },
   subtitle: {
     fontSize: 16,
-    opacity: 0.8,
+    opacity: 0.7,
   },
-  signOutText: {
-    fontSize: 16,
-    fontWeight: "600",
+  tabs: {
+    flexDirection: "row",
+    paddingHorizontal: 20,
+    marginBottom: 20,
+  },
+  tab: {
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    marginRight: 10,
+  },
+  activeTab: {
+    backgroundColor: "#EEF2FF",
+    borderRadius: 20,
+  },
+  tabText: {
+    color: "#64748B",
+  },
+  activeTabText: {
+    color: "#3B82F6",
+    fontWeight: "500",
   },
   card: {
-    borderRadius: 16,
-    padding: 20,
-    marginBottom: 20,
+    backgroundColor: "white",
+    borderRadius: 12,
+    padding: 16,
+    marginHorizontal: 20,
+    marginBottom: 16,
     shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 3.84,
-    elevation: 5,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 3,
   },
-  cardTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 15,
+  statusCard: {
+    marginBottom: 20,
   },
-  progressContainer: {
+  statusHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
     alignItems: "center",
   },
-  progressBar: {
-    width: "100%",
-    height: 8,
-    backgroundColor: "#E0E0E0",
-    borderRadius: 4,
-    marginBottom: 10,
-  },
-  progressFill: {
-    height: "100%",
-    borderRadius: 4,
-  },
-  progressText: {
+  cardTitle: {
     fontSize: 16,
-    fontWeight: "600",
+    fontWeight: "500",
+    color: "#1E293B",
   },
-  statsContainer: {
+  statusBadge: {
+    backgroundColor: "#DCFCE7",
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+  },
+  statusText: {
+    color: "#059669",
+    fontSize: 14,
+    fontWeight: "500",
+  },
+  lastChecked: {
+    color: "#64748B",
+    fontSize: 14,
+    marginTop: 4,
+  },
+  statsGrid: {
     flexDirection: "row",
-    gap: 15,
-    marginBottom: 20,
+    marginHorizontal: 20,
+    gap: 16,
+    marginBottom: 24,
   },
   statCard: {
     flex: 1,
-    borderRadius: 16,
-    padding: 20,
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 3.84,
-    elevation: 5,
   },
-  statNumber: {
-    fontSize: 32,
-    fontWeight: "bold",
-    marginBottom: 5,
-  },
-  statLabel: {
+  statTitle: {
     fontSize: 14,
-    textAlign: "center",
+    color: "#64748B",
+    marginBottom: 8,
+  },
+  statValue: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "#1E293B",
+    marginBottom: 4,
+  },
+  statSubtext: {
+    fontSize: 14,
+    color: "#64748B",
+  },
+  quickActions: {
+    padding: 20,
+  },
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: "500",
+    color: "#1E293B",
+    marginBottom: 4,
+  },
+  sectionSubtitle: {
+    fontSize: 14,
+    color: "#64748B",
+    marginBottom: 16,
+  },
+  actionButton: {
+    backgroundColor: "#3B82F6",
+    padding: 16,
+    borderRadius: 12,
+    alignItems: "center",
+    marginBottom: 12,
+  },
+  actionButtonText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "500",
+  },
+  actionButtonSecondary: {
+    backgroundColor: "#F8FAFC",
+    padding: 16,
+    borderRadius: 12,
+    alignItems: "center",
+    marginBottom: 12,
+  },
+  actionButtonTextSecondary: {
+    color: "#1E293B",
+    fontSize: 16,
+    fontWeight: "500",
+  },
+  recentActivity: {
+    padding: 20,
   },
   activityItem: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 15,
+    marginBottom: 16,
   },
-  activityIcon: {
-    fontSize: 24,
-    marginRight: 15,
+  activityDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: "#22C55E",
+    marginRight: 12,
   },
   activityContent: {
     flex: 1,
   },
   activityTitle: {
-    fontSize: 16,
-    fontWeight: "600",
+    fontSize: 14,
+    color: "#1E293B",
     marginBottom: 2,
   },
   activityTime: {
     fontSize: 14,
-    opacity: 0.7,
-  },
-  checkupContainer: {
-    alignItems: "center",
-  },
-  checkupDate: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 10,
-  },
-  checkupText: {
-    fontSize: 16,
-    textAlign: "center",
-    opacity: 0.8,
-  },
-  quickActions: {
-    gap: 15,
-    marginBottom: 30,
-  },
-  actionButton: {
-    paddingVertical: 16,
-    paddingHorizontal: 24,
-    borderRadius: 12,
-    alignItems: "center",
-    borderWidth: 1,
-  },
-  actionButtonText: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "white",
+    color: "#64748B",
   },
 });
