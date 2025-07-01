@@ -1,137 +1,145 @@
-import Button from "@/components/ui/Button";
-import Card from "@/components/ui/Card";
-import { Colors } from "@/constants/Colors";
-import { Link } from "expo-router";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { Link } from 'expo-router';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ThemedView } from '../../components/ThemedView';
+import Button from '../../components/ui/Button';
 
-export default function WelcomeScreen() {
+export default function LandingScreen() {
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Wound Assistant</Text>
-        <Text style={styles.subtitle}>C-Section Recovery Monitoring</Text>
-      </View>
+    <ThemedView style={styles.container}>
+      <ScrollView style={styles.content}>
+        <View style={styles.logo}>
+          <View style={styles.iconContainer}>
+            <Text style={styles.iconText}>❤️</Text>
+          </View>
+          <Text style={styles.appName}>WoundTrack</Text>
+        </View>
 
-      <View style={styles.hero}>
-        <View style={styles.heroContent}>
-          <Text style={styles.heroTitle}>Monitor Your Recovery</Text>
-          <Text style={styles.heroDescription}>
-            Track your C-section wound healing progress with AI-powered analysis
-            and get early infection alerts.
+        <View style={styles.header}>
+          <Text style={styles.title}>Your Recovery,{'\n'}Monitored</Text>
+          <Text style={styles.subtitle}>
+            AI-powered C-section wound monitoring for new mothers. Track your healing progress, 
+            get instant health insights, and find nearby medical care when you need it most.
           </Text>
         </View>
-      </View>
 
-      <View style={styles.features}>
-        <Card style={styles.featureCard}>
-          <Text style={styles.featureTitle}>📸 Photo Analysis</Text>
-          <Text style={styles.featureText}>
-            Capture wound photos and get instant AI analysis for infection
-            detection.
-          </Text>
-        </Card>
+        <View style={styles.features}>
+          <View style={styles.featureItem}>
+            <View style={styles.featureIcon}>
+              <Text>📸</Text>
+            </View>
+            <Text style={styles.featureTitle}>Smart Monitoring</Text>
+            <Text style={styles.featureText}>
+              Capture wound photos with your phone camera and get instant AI-powered health assessments
+            </Text>
+          </View>
 
-        <Card style={styles.featureCard}>
-          <Text style={styles.featureTitle}>📊 Progress Tracking</Text>
-          <Text style={styles.featureText}>
-            Monitor your healing progress with detailed charts and metrics.
-          </Text>
-        </Card>
+          <View style={styles.featureItem}>
+            <View style={styles.featureIcon}>
+              <Text>🛡️</Text>
+            </View>
+            <Text style={styles.featureTitle}>Early Detection</Text>
+            <Text style={styles.featureText}>
+              Get alerts for potential infections or complications before they become serious
+            </Text>
+          </View>
+        </View>
 
-        <Card style={styles.featureCard}>
-          <Text style={styles.featureTitle}>🏥 Hospital Finder</Text>
-          <Text style={styles.featureText}>
-            Find nearby hospitals and healthcare facilities when you need them.
-          </Text>
-        </Card>
-
-        <Card style={styles.featureCard}>
-          <Text style={styles.featureTitle}>🚨 Early Alerts</Text>
-          <Text style={styles.featureText}>
-            Get notified about potential infections and complications early.
-          </Text>
-        </Card>
-      </View>
-
-      <View style={styles.actions}>
-        <Link href="/(auth)/login" asChild>
-          <Button title="Sign In" variant="primary" />
-        </Link>
-
-        <Link href="/(auth)/register" asChild>
-          <Button title="Create Account" variant="outline" />
-        </Link>
-      </View>
-    </ScrollView>
+        <View style={styles.actions}>
+          <Link href="/(auth)/register" asChild>
+            <Button variant="primary" onPress={() => {}} style={styles.button} title="Start Tracking" />
+          </Link>
+          <Link href="/(auth)/login" asChild>
+            <Button  variant="secondary" onPress={() => {}} style={styles.button} title="Login" />
+              
+          </Link>
+        </View>
+      </ScrollView>
+    </ThemedView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.light.background,
   },
   content: {
+    flex: 1,
     padding: 20,
-    paddingTop: 60,
+  },
+  logo: {
+    alignItems: 'center',
+    marginBottom: 40,
+  },
+  iconContainer: {
+    width: 60,
+    height: 60,
+    borderRadius: 15,
+    backgroundColor: '#E8EFFF',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 10,
+  },
+  iconText: {
+    fontSize: 30,
+  },
+  appName: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#1849D7',
   },
   header: {
-    alignItems: "center",
+    alignItems: 'center',
     marginBottom: 40,
   },
   title: {
     fontSize: 32,
-    fontWeight: "bold",
-    color: Colors.light.primary,
-    marginBottom: 8,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 16,
+    color: '#1849D7',
   },
   subtitle: {
     fontSize: 16,
-    color: Colors.light.gray[600],
-    textAlign: "center",
-  },
-  hero: {
-    backgroundColor: Colors.light.blue[50],
-    borderRadius: 20,
-    padding: 24,
-    marginBottom: 32,
-    borderWidth: 1,
-    borderColor: Colors.light.blue[200],
-  },
-  heroContent: {
-    alignItems: "center",
-  },
-  heroTitle: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: Colors.light.primary,
-    marginBottom: 12,
-    textAlign: "center",
-  },
-  heroDescription: {
-    fontSize: 16,
-    color: Colors.light.gray[700],
-    textAlign: "center",
+    textAlign: 'center',
+    color: '#666',
     lineHeight: 24,
   },
   features: {
-    marginBottom: 32,
+    width: '100%',
+    marginBottom: 40,
   },
-  featureCard: {
+  featureItem: {
+    backgroundColor: '#fff',
+    borderRadius: 15,
+    padding: 20,
     marginBottom: 16,
+    alignItems: 'center',
+  },
+  featureIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#E8EFFF',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 10,
   },
   featureTitle: {
     fontSize: 18,
-    fontWeight: "600",
-    color: Colors.light.text,
+    fontWeight: 'bold',
     marginBottom: 8,
+    color: '#1849D7',
   },
   featureText: {
     fontSize: 14,
-    color: Colors.light.gray[600],
+    textAlign: 'center',
+    color: '#666',
     lineHeight: 20,
   },
   actions: {
-    gap: 12,
+    width: '100%',
+  },
+  button: {
+    marginBottom: 12,
   },
 });

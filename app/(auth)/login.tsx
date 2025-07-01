@@ -1,154 +1,150 @@
-import Button from "@/components/ui/Button";
-import Card from "@/components/ui/Card";
-import Input from "@/components/ui/Input";
-import { Colors } from "@/constants/Colors";
-import { useAuth } from "@/contexts/AuthContext";
-import { Link, router } from "expo-router";
-import { useState } from "react";
-import { Alert, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Link, router } from 'expo-router';
+import { useState } from 'react';
+import { StyleSheet, Text, View } from 'react-native';
+import { ThemedView } from '../../components/ThemedView';
+import Button from '../../components/ui/Button';
+import Input from '../../components/ui/Input';
 
 export default function LoginScreen() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
-  const { signIn } = useAuth();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
-  const handleLogin = async () => {
-    if (!email || !password) {
-      Alert.alert("Error", "Please fill in all fields");
-      return;
-    }
-
-    setLoading(true);
-    try {
-      await signIn(email, password);
-      router.replace("/(app)");
-    } catch (error) {
-      Alert.alert("Error", "Invalid email or password");
-    } finally {
-      setLoading(false);
-    }
+  const handleLogin = () => {
+    // TODO: Implement actual login logic
+    router.replace('/(tabs)');
   };
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Welcome Back</Text>
-        <Text style={styles.subtitle}>
-          Sign in to continue monitoring your recovery
-        </Text>
-      </View>
+    <ThemedView style={styles.container}>
+      <Link href="/" style={styles.backLink}>
+        <Text style={styles.backText}>← Back to Home</Text>
+      </Link>
 
-      <Card style={styles.formCard}>
-        <Input
-          label="Email"
-          value={email}
-          onChangeText={setEmail}
-          placeholder="Enter your email"
-          keyboardType="email-address"
-          autoCapitalize="none"
-        />
-
-        <Input
-          label="Password"
-          value={password}
-          onChangeText={setPassword}
-          placeholder="Enter your password"
-          secureTextEntry
-        />
-
-        <Button
-          title="Sign In"
-          onPress={handleLogin}
-          loading={loading}
-          style={styles.loginButton}
-        />
-
-        <View style={styles.divider}>
-          <View style={styles.dividerLine} />
-          <Text style={styles.dividerText}>or</Text>
-          <View style={styles.dividerLine} />
+      <View style={styles.card}>
+        <View style={styles.logo}>
+          <View style={styles.iconContainer}>
+            <Text style={styles.iconText}>❤️</Text>
+          </View>
+          <Text style={styles.welcomeText}>Welcome Back</Text>
+          <Text style={styles.subtitle}>Sign in to continue tracking your recovery</Text>
         </View>
 
-        <Button
-          title="Continue with Google"
-          variant="outline"
-          onPress={() =>
-            Alert.alert("Coming Soon", "Google sign-in will be available soon")
-          }
-        />
-      </Card>
+        <View style={styles.form}>
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>Email</Text>
+            <Input
+              placeholder="your.email@example.com"
+              value={email}
+              onChangeText={setEmail}
+              keyboardType="email-address"
+              autoCapitalize="none"
+              icon="mail"
+            />
+          </View>
 
-      <View style={styles.footer}>
-        <Text style={styles.footerText}>Don't have an account? </Text>
-        <Link href="/(auth)/register" style={styles.link}>
-          <Text style={styles.linkText}>Sign Up</Text>
-        </Link>
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>Password</Text>
+            <Input
+              placeholder="••••••••"
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry
+              icon="lock"
+            />
+          </View>
+
+          <Button
+            variant="primary"
+            onPress={handleLogin}
+            style={styles.button}
+            title="Sign In"
+          />
+
+          <View style={styles.footer}>
+            <Text style={styles.footerText}>Don't have an account? </Text>
+            <Link href="/(auth)/register">
+              <Text style={styles.footerLink}>Sign up here</Text>
+            </Link>
+          </View>
+        </View>
       </View>
-    </ScrollView>
+    </ThemedView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.light.background,
-  },
-  content: {
     padding: 20,
-    paddingTop: 40,
   },
-  header: {
-    alignItems: "center",
+  backLink: {
+    marginBottom: 20,
+  },
+  backText: {
+    color: '#1849D7',
+    fontSize: 16,
+  },
+  card: {
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    padding: 24,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3,
+  },
+  logo: {
+    alignItems: 'center',
     marginBottom: 32,
   },
-  title: {
-    fontSize: 28,
-    fontWeight: "bold",
-    color: Colors.light.text,
+  iconContainer: {
+    width: 60,
+    height: 60,
+    borderRadius: 15,
+    backgroundColor: '#E8EFFF',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 16,
+  },
+  iconText: {
+    fontSize: 30,
+  },
+  welcomeText: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#1849D7',
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 16,
-    color: Colors.light.gray[600],
-    textAlign: "center",
+    color: '#666',
+    textAlign: 'center',
   },
-  formCard: {
-    marginBottom: 24,
+  form: {
+    gap: 20,
   },
-  loginButton: {
+  inputGroup: {
+    gap: 8,
+  },
+  label: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: '#333',
+  },
+  button: {
     marginTop: 8,
   },
-  divider: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginVertical: 20,
-  },
-  dividerLine: {
-    flex: 1,
-    height: 1,
-    backgroundColor: Colors.light.border,
-  },
-  dividerText: {
-    marginHorizontal: 16,
-    color: Colors.light.gray[500],
-    fontSize: 14,
-  },
   footer: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginTop: 16,
   },
   footerText: {
-    color: Colors.light.gray[600],
-    fontSize: 16,
+    color: '#666',
   },
-  link: {
-    marginLeft: 4,
-  },
-  linkText: {
-    color: Colors.light.primary,
-    fontSize: 16,
-    fontWeight: "600",
+  footerLink: {
+    color: '#1849D7',
+    fontWeight: '500',
   },
 });
