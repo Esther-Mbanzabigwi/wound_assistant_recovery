@@ -1,24 +1,57 @@
-import { Link, router } from 'expo-router';
-import { useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import { ThemedView } from '../../components/ThemedView';
-import Button from '../../components/ui/Button';
-import Input from '../../components/ui/Input';
+import { Link, router } from "expo-router";
+import { useState } from "react";
+import { Alert, ScrollView, StyleSheet, Text, View } from "react-native";
+import { ThemedView } from "../../components/ThemedView";
+import Button from "../../components/ui/Button";
+import Input from "../../components/ui/Input";
+import { useAuthContext } from "../../context/authcontext";
 
 export default function RegisterScreen() {
-  const [fullName, setFullName] = useState('');
-  const [email, setEmail] = useState('');
-  const [phoneNumber, setPhoneNumber] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const { register } = useAuthContext();
 
-  const handleRegister = () => {
-    // TODO: Implement actual registration logic
-    router.replace('/(tabs)');
+  const handleRegister = async () => {
+    if (!fullName || !email || !phoneNumber || !password || !confirmPassword) {
+      Alert.alert("Error", "Please fill in all fields");
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      Alert.alert("Error", "Passwords do not match");
+      return;
+    }
+
+    if (password.length < 6) {
+      Alert.alert("Error", "Password must be at least 6 characters long");
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      await register({
+        username: fullName,
+        email,
+        phone: phoneNumber,
+        password,
+      });
+      router.replace("/(tabs)");
+    } catch (error) {
+      Alert.alert(
+        "Registration Failed",
+        error instanceof Error ? error.message : "An error occurred"
+      );
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
-    <ThemedView style={styles.container}>
+    <ScrollView style={styles.container}>
       <Link href="/" style={styles.backLink}>
         <Text style={styles.backText}>← Back to Home</Text>
       </Link>
@@ -29,7 +62,9 @@ export default function RegisterScreen() {
             <Text style={styles.iconText}>❤️</Text>
           </View>
           <Text style={styles.welcomeText}>Join WoundTrack</Text>
-          <Text style={styles.subtitle}>Create your account to start monitoring your recovery</Text>
+          <Text style={styles.subtitle}>
+            Create your account to start monitoring your recovery
+          </Text>
         </View>
 
         <View style={styles.form}>
@@ -92,7 +127,8 @@ export default function RegisterScreen() {
             variant="primary"
             onPress={handleRegister}
             style={styles.button}
-            title="Create Account"
+            title={isLoading ? "Creating Account..." : "Create Account"}
+            disabled={isLoading}
           />
 
           <View style={styles.footer}>
@@ -103,7 +139,7 @@ export default function RegisterScreen() {
           </View>
         </View>
       </View>
-    </ThemedView>
+    </ScrollView>
   );
 }
 
@@ -116,30 +152,30 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   backText: {
-    color: '#1849D7',
+    color: "#1849D7",
     fontSize: 16,
   },
   card: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderRadius: 20,
     padding: 24,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
     elevation: 3,
   },
   logo: {
-    alignItems: 'center',
+    alignItems: "center",
     marginBottom: 32,
   },
   iconContainer: {
     width: 60,
     height: 60,
     borderRadius: 15,
-    backgroundColor: '#E8EFFF',
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: "#E8EFFF",
+    alignItems: "center",
+    justifyContent: "center",
     marginBottom: 16,
   },
   iconText: {
@@ -147,14 +183,14 @@ const styles = StyleSheet.create({
   },
   welcomeText: {
     fontSize: 24,
-    fontWeight: 'bold',
-    color: '#1849D7',
+    fontWeight: "bold",
+    color: "#1849D7",
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 16,
-    color: '#666',
-    textAlign: 'center',
+    color: "#666",
+    textAlign: "center",
   },
   form: {
     gap: 20,
@@ -164,22 +200,22 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 16,
-    fontWeight: '500',
-    color: '#333',
+    fontWeight: "500",
+    color: "#333",
   },
   button: {
     marginTop: 8,
   },
   footer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
+    flexDirection: "row",
+    justifyContent: "center",
     marginTop: 16,
   },
   footerText: {
-    color: '#666',
+    color: "#666",
   },
   footerLink: {
-    color: '#1849D7',
-    fontWeight: '500',
+    color: "#1849D7",
+    fontWeight: "500",
   },
 });

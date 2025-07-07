@@ -1,17 +1,35 @@
-import { Link, router } from 'expo-router';
-import { useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import { ThemedView } from '../../components/ThemedView';
-import Button from '../../components/ui/Button';
-import Input from '../../components/ui/Input';
+import { Link, router } from "expo-router";
+import { useState } from "react";
+import { Alert, StyleSheet, Text, View } from "react-native";
+import { ThemedView } from "../../components/ThemedView";
+import Button from "../../components/ui/Button";
+import Input from "../../components/ui/Input";
+import { useAuthContext } from "../../context/authcontext";
 
 export default function LoginScreen() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const { login } = useAuthContext();
 
-  const handleLogin = () => {
-    // TODO: Implement actual login logic
-    router.replace('/(tabs)');
+  const handleLogin = async () => {
+    if (!email || !password) {
+      Alert.alert("Error", "Please fill in all fields");
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      await login({ identifier: email, password });
+      router.replace("/(tabs)");
+    } catch (error) {
+      Alert.alert(
+        "Login Failed",
+        error instanceof Error ? error.message : "An error occurred"
+      );
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -26,7 +44,9 @@ export default function LoginScreen() {
             <Text style={styles.iconText}>❤️</Text>
           </View>
           <Text style={styles.welcomeText}>Welcome Back</Text>
-          <Text style={styles.subtitle}>Sign in to continue tracking your recovery</Text>
+          <Text style={styles.subtitle}>
+            Sign in to continue tracking your recovery
+          </Text>
         </View>
 
         <View style={styles.form}>
@@ -57,11 +77,12 @@ export default function LoginScreen() {
             variant="primary"
             onPress={handleLogin}
             style={styles.button}
-            title="Sign In"
+            title={isLoading ? "Signing In..." : "Sign In"}
+            disabled={isLoading}
           />
 
           <View style={styles.footer}>
-            <Text style={styles.footerText}>Don't have an account? </Text>
+            <Text style={styles.footerText}>Don&apos;t have an account? </Text>
             <Link href="/(auth)/register">
               <Text style={styles.footerLink}>Sign up here</Text>
             </Link>
@@ -81,30 +102,30 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   backText: {
-    color: '#1849D7',
+    color: "#1849D7",
     fontSize: 16,
   },
   card: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderRadius: 20,
     padding: 24,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
     elevation: 3,
   },
   logo: {
-    alignItems: 'center',
+    alignItems: "center",
     marginBottom: 32,
   },
   iconContainer: {
     width: 60,
     height: 60,
     borderRadius: 15,
-    backgroundColor: '#E8EFFF',
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: "#E8EFFF",
+    alignItems: "center",
+    justifyContent: "center",
     marginBottom: 16,
   },
   iconText: {
@@ -112,14 +133,14 @@ const styles = StyleSheet.create({
   },
   welcomeText: {
     fontSize: 24,
-    fontWeight: 'bold',
-    color: '#1849D7',
+    fontWeight: "bold",
+    color: "#1849D7",
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 16,
-    color: '#666',
-    textAlign: 'center',
+    color: "#666",
+    textAlign: "center",
   },
   form: {
     gap: 20,
@@ -129,22 +150,22 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 16,
-    fontWeight: '500',
-    color: '#333',
+    fontWeight: "500",
+    color: "#333",
   },
   button: {
     marginTop: 8,
   },
   footer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
+    flexDirection: "row",
+    justifyContent: "center",
     marginTop: 16,
   },
   footerText: {
-    color: '#666',
+    color: "#666",
   },
   footerLink: {
-    color: '#1849D7',
-    fontWeight: '500',
+    color: "#1849D7",
+    fontWeight: "500",
   },
 });

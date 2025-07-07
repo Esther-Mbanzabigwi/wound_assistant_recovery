@@ -7,13 +7,6 @@ export default function LandingScreen() {
   return (
     <ThemedView style={styles.container}>
       <ScrollView style={styles.content}>
-        <View style={styles.logo}>
-          <View style={styles.iconContainer}>
-            <Text style={styles.iconText}>❤️</Text>
-          </View>
-          <Text style={styles.appName}>WoundTrack</Text>
-        </View>
-
         <View style={styles.header}>
           <Text style={styles.title}>Your Recovery,{'\n'}Monitored</Text>
           <Text style={styles.subtitle}>

@@ -1,14 +1,21 @@
-import { Link } from 'expo-router';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
-import { ThemedView } from '../../components/ThemedView';
-import Button from '../../components/ui/Button';
+import { Link } from "expo-router";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { ThemedView } from "../../components/ThemedView";
+import Button from "../../components/ui/Button";
+import { useAuthContext } from "../../context/authcontext";
 
 export default function OverviewScreen() {
+  const { user, logout } = useAuthContext();
+
   return (
     <ThemedView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>Welcome back, Sarah!</Text>
-        <Text style={styles.subtitle}>Track your recovery progress and stay healthy</Text>
+        <Text style={styles.title}>
+          Welcome back, {user?.username || "User"}!
+        </Text>
+        <Text style={styles.subtitle}>
+          Track your recovery progress and stay healthy
+        </Text>
       </View>
 
       <ScrollView style={styles.content}>
@@ -44,7 +51,9 @@ export default function OverviewScreen() {
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Quick Actions</Text>
-          <Text style={styles.sectionSubtitle}>Common tasks for your recovery tracking</Text>
+          <Text style={styles.sectionSubtitle}>
+            Common tasks for your recovery tracking
+          </Text>
 
           <View style={styles.actionGrid}>
             <Link href="/capture" asChild>
@@ -73,6 +82,13 @@ export default function OverviewScreen() {
                 onPress={() => {}}
               />
             </Link>
+
+            <Button
+              title="Logout"
+              variant="outline"
+              style={styles.actionButton}
+              onPress={logout}
+            />
           </View>
         </View>
 
@@ -84,7 +100,9 @@ export default function OverviewScreen() {
                 <Text>✅</Text>
               </View>
               <View style={styles.activityContent}>
-                <Text style={styles.activityTitle}>Wound assessment - Healthy</Text>
+                <Text style={styles.activityTitle}>
+                  Wound assessment - Healthy
+                </Text>
                 <Text style={styles.activityTime}>2 hours ago</Text>
               </View>
             </View>
@@ -104,7 +122,9 @@ export default function OverviewScreen() {
                 <Text>✅</Text>
               </View>
               <View style={styles.activityContent}>
-                <Text style={styles.activityTitle}>Wound assessment - Healthy</Text>
+                <Text style={styles.activityTitle}>
+                  Wound assessment - Healthy
+                </Text>
                 <Text style={styles.activityTime}>1 day ago</Text>
               </View>
             </View>
@@ -125,13 +145,13 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 24,
-    fontWeight: 'bold',
-    color: '#1849D7',
+    fontWeight: "bold",
+    color: "#1849D7",
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 16,
-    color: '#666',
+    color: "#666",
   },
   content: {
     flex: 1,
@@ -139,91 +159,91 @@ const styles = StyleSheet.create({
     paddingTop: 0,
   },
   statusCard: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderRadius: 16,
     padding: 16,
     marginBottom: 24,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 2,
   },
   statusHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 8,
   },
   statusTitle: {
     fontSize: 18,
-    fontWeight: '600',
-    color: '#333',
+    fontWeight: "600",
+    color: "#333",
   },
   statusBadge: {
-    backgroundColor: '#DCFCE7',
+    backgroundColor: "#DCFCE7",
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 20,
   },
   statusText: {
-    color: '#22C55E',
-    fontWeight: '600',
+    color: "#22C55E",
+    fontWeight: "600",
   },
   lastChecked: {
     fontSize: 14,
-    color: '#666',
+    color: "#666",
   },
   metricsGrid: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 16,
     marginBottom: 32,
   },
   metricCard: {
     flex: 1,
-    backgroundColor: '#F5F7FF',
+    backgroundColor: "#F5F7FF",
     borderRadius: 16,
     padding: 16,
-    alignItems: 'center',
+    alignItems: "center",
   },
   metricIcon: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: "#fff",
+    alignItems: "center",
+    justifyContent: "center",
     marginBottom: 12,
   },
   metricValue: {
     fontSize: 24,
-    fontWeight: 'bold',
-    color: '#1849D7',
+    fontWeight: "bold",
+    color: "#1849D7",
     marginBottom: 4,
   },
   metricLabel: {
     fontSize: 14,
-    color: '#666',
+    color: "#666",
     marginBottom: 4,
-    textAlign: 'center',
+    textAlign: "center",
   },
   metricStatus: {
     fontSize: 12,
-    color: '#22C55E',
-    fontWeight: '500',
+    color: "#22C55E",
+    fontWeight: "500",
   },
   section: {
     marginBottom: 32,
   },
   sectionTitle: {
     fontSize: 20,
-    fontWeight: '600',
-    color: '#333',
+    fontWeight: "600",
+    color: "#333",
     marginBottom: 8,
   },
   sectionSubtitle: {
     fontSize: 14,
-    color: '#666',
+    color: "#666",
     marginBottom: 16,
   },
   actionGrid: {
@@ -236,16 +256,16 @@ const styles = StyleSheet.create({
     gap: 16,
   },
   activityItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   activityIcon: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#F5F7FF',
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: "#F5F7FF",
+    alignItems: "center",
+    justifyContent: "center",
     marginRight: 12,
   },
   activityContent: {
@@ -253,11 +273,11 @@ const styles = StyleSheet.create({
   },
   activityTitle: {
     fontSize: 16,
-    color: '#333',
+    color: "#333",
     marginBottom: 4,
   },
   activityTime: {
     fontSize: 14,
-    color: '#666',
+    color: "#666",
   },
 });
