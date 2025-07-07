@@ -106,7 +106,7 @@ export default function RegisterScreen() {
               <View style={styles.inputGroup}>
                 <Text style={styles.label}>Phone Number</Text>
                 <Input
-                  placeholder="+1 (555) 000-0000"
+                  placeholder="+ (250) 000-000-000"
                   value={phoneNumber}
                   onChangeText={setPhoneNumber}
                   keyboardType="phone-pad"
