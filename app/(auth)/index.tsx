@@ -19,12 +19,12 @@ export default function LandingScreen() {
                 resizeMode="contain"
               />
             </View>
-            <Text style={styles.title}>C-SECTION{'\n'}Wound Tracker</Text>
+            <Text style={styles.title}>MotherMend{'\n'}Wound Tracker</Text>
             <Text style={styles.subtitle}>
-              For Every New Mother
+              For C-section New Mother
             </Text>
           </View>
-
+          
           <View style={styles.mainFeature}>
             <Text style={styles.featureHighlight}>
               Track what 82% of mothers{'\n'}are never told about{'\n'}C-section recovery
@@ -34,7 +34,7 @@ export default function LandingScreen() {
           <View style={styles.features}>
             <View style={styles.featureItem}>
               <Text style={styles.featureText}>
-                AI-Powered Wound Monitoring
+                C-SECTION Wound Monitoring
               </Text>
             </View>
 
@@ -47,6 +47,12 @@ export default function LandingScreen() {
             <View style={styles.featureItem}>
               <Text style={styles.featureText}>
                 Expert Recovery Guidance
+              </Text>
+            </View>
+
+            <View style={styles.featureItem}>
+              <Text style={styles.featureText}>
+                Track Nearby Hospitals
               </Text>
             </View>
           </View>
@@ -73,7 +79,7 @@ const styles = StyleSheet.create({
   },
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(255, 255, 255, 0.15)', // Very subtle white overlay to ensure text readability
+    backgroundColor: 'rgba(255, 255, 255, 0.15)',
   },
   content: {
     flex: 1,
@@ -114,7 +120,7 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 20,
-    color: '#8B4D47', // Deeper warm tone
+    color: '#8B4D47',
     marginTop: 8,
     letterSpacing: 1,
     textShadowColor: 'rgba(255, 255, 255, 0.8)',
@@ -123,26 +129,26 @@ const styles = StyleSheet.create({
   },
   mainFeature: {
     alignItems: 'center',
-    marginBottom: 20,
-    padding: 20,
+    marginBottom: 16,
+    padding: 16,
   },
   featureHighlight: {
     fontSize: 24,
     textAlign: 'center',
-    color: '#8B4D47', // Deeper warm tone
+    color: '#8B4D47',
     lineHeight: 32,
     textShadowColor: 'rgba(255, 255, 255, 0.8)',
     textShadowOffset: { width: 1, height: 1 },
     textShadowRadius: 2,
   },
   features: {
-    marginBottom: 20,
+    marginBottom: 16,
   },
   featureItem: {
     backgroundColor: 'rgba(255, 255, 255, 0.75)',
     borderRadius: 12,
-    padding: 12,
-    marginBottom: 8,
+    padding: 10,
+    marginBottom: 6,
     borderColor: 'rgba(212, 117, 109, 0.3)',
     borderWidth: 1,
     elevation: 2,
@@ -153,7 +159,7 @@ const styles = StyleSheet.create({
   },
   featureText: {
     fontSize: 18,
-    color: '#8B4D47', // Deeper warm tone
+    color: '#8B4D47',
     textAlign: 'center',
     textShadowColor: 'rgba(255, 255, 255, 0.8)',
     textShadowOffset: { width: 0, height: 1 },
@@ -162,10 +168,10 @@ const styles = StyleSheet.create({
   actions: {
     width: '100%',
     paddingHorizontal: 20,
-    marginTop: 10,
+    marginTop: 6,
   },
   button: {
-    marginBottom: 8,
+    marginBottom: 6,
     borderRadius: 12,
   },
 });

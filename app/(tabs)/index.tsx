@@ -60,8 +60,8 @@ export default function OverviewScreen() {
               <Button
                 title="Take New Photo"
                 variant="primary"
-                style={styles.actionButton}
                 onPress={() => {}}
+                style={styles.actionButton}
               />
             </Link>
 
@@ -69,8 +69,8 @@ export default function OverviewScreen() {
               <Button
                 title="View History"
                 variant="secondary"
-                style={styles.actionButton}
                 onPress={() => {}}
+                style={styles.actionButton}
               />
             </Link>
 
@@ -78,8 +78,8 @@ export default function OverviewScreen() {
               <Button
                 title="Find Hospitals"
                 variant="secondary"
-                style={styles.actionButton}
                 onPress={() => {}}
+                style={styles.actionButton}
               />
             </Link>
 

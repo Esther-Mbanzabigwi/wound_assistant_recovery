@@ -1,99 +1,148 @@
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, Text, View, FlatList, Image, TouchableOpacity, RefreshControl } from 'react-native';
+import { useRouter } from 'expo-router';
 import { ThemedView } from '../../components/ThemedView';
-import Button from '../../components/ui/Button';
+import api from '../../api';
+
+interface PredictionHistory {
+  id: number;
+  attributes: {
+    imageUrl: string;
+    classification: string;
+    confidence: number;
+    urgencyLevel: string;
+    requiresHospital: boolean;
+    recommendations: string[];
+    timestamp: string;
+  };
+}
 
 export default function HistoryScreen() {
+  const [history, setHistory] = useState<PredictionHistory[]>([]);
+  const [refreshing, setRefreshing] = useState(false);
+  const router = useRouter();
+
+  const loadHistory = async () => {
+    try {
+      const response = await api.predictions.getHistory();
+      setHistory(response.data);
+    } catch (error) {
+      console.error('Failed to load history:', error);
+    }
+  };
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await loadHistory();
+    setRefreshing(false);
+  };
+
+  useEffect(() => {
+    loadHistory();
+  }, []);
+
+  const getUrgencyColor = (level: string) => {
+    switch (level.toUpperCase()) {
+      case 'HIGH':
+        return '#FF4444';
+      case 'MEDIUM':
+        return '#FFA500';
+      case 'LOW':
+        return '#44BB44';
+      default:
+        return '#666666';
+    }
+  };
+
+  const formatDate = (timestamp: string) => {
+    const date = new Date(timestamp);
+    return date.toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  };
+
+  const renderItem = ({ item }: { item: PredictionHistory }) => (
+    <TouchableOpacity
+      style={styles.historyCard}
+      onPress={() => {
+        router.push({
+          pathname: '/results',
+          params: {
+            prediction: JSON.stringify({
+              predicted_class: item.attributes.classification,
+              confidence: item.attributes.confidence,
+              urgency_level: item.attributes.urgencyLevel,
+              requires_hospital: item.attributes.requiresHospital,
+              recommendations: item.attributes.recommendations,
+            }),
+            imageUri: item.attributes.imageUrl,
+          },
+        });
+      }}
+    >
+      <View style={styles.cardHeader}>
+        <Image
+          source={{ uri: item.attributes.imageUrl }}
+          style={styles.thumbnail}
+        />
+        <View style={styles.cardInfo}>
+          <Text style={styles.classification}>
+            {item.attributes.classification}
+          </Text>
+          <Text style={styles.timestamp}>
+            {formatDate(item.attributes.timestamp)}
+          </Text>
+          <View style={styles.urgencyContainer}>
+            <View
+              style={[
+                styles.urgencyBadge,
+                {
+                  backgroundColor: getUrgencyColor(item.attributes.urgencyLevel),
+                },
+              ]}
+            >
+              <Text style={styles.urgencyText}>
+                {item.attributes.urgencyLevel}
+              </Text>
+            </View>
+            {item.attributes.requiresHospital && (
+              <Text style={styles.hospitalIndicator}>⚠️ Hospital Visit</Text>
+            )}
+          </View>
+        </View>
+      </View>
+    </TouchableOpacity>
+  );
+
   return (
     <ThemedView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>Recovery Timeline</Text>
-        <Text style={styles.subtitle}>Track your wound healing progress over time</Text>
+        <Text style={styles.title}>Analysis History</Text>
+        <Text style={styles.subtitle}>
+          Review your past wound analyses and track healing progress
+        </Text>
       </View>
 
-      <View style={styles.stats}>
-        <View style={styles.statCard}>
-          <Text style={styles.statValue}>12</Text>
-          <Text style={styles.statLabel}>Days Since Surgery</Text>
-        </View>
-
-        <View style={styles.statCard}>
-          <Text style={styles.statValue}>8</Text>
-          <Text style={styles.statLabel}>Photos Analyzed</Text>
-        </View>
-
-        <View style={styles.statCard}>
-          <Text style={styles.statValue}>87%</Text>
-          <Text style={styles.statLabel}>Avg. Health Score</Text>
-        </View>
-      </View>
-
-      <View style={styles.section}>
-        <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Photo History</Text>
-          <Button
-            title="View Trends"
-            variant="secondary"
-            onPress={() => {}}
-            style={styles.viewButton}
-          />
-        </View>
-
-        <ScrollView style={styles.timeline}>
-          <View style={styles.timelineItem}>
-            <View style={styles.timelinePhoto}>
-              <Text style={styles.photoPlaceholder}>📸</Text>
-            </View>
-            <View style={styles.timelineContent}>
-              <Text style={styles.timelineDate}>2024-06-29 14:30</Text>
-              <Text style={styles.timelineStatus}>Healthy</Text>
-              <Text style={styles.timelineConfidence}>Confidence: 95%</Text>
-              <Text style={styles.timelineNote}>Wound healing progressing well</Text>
-              <Button
-                title="View Details"
-                variant="secondary"
-                onPress={() => {}}
-                style={styles.detailsButton}
-              />
-            </View>
+      <FlatList
+        data={history}
+        renderItem={renderItem}
+        keyExtractor={(item) => item.id.toString()}
+        contentContainerStyle={styles.list}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+        ListEmptyComponent={
+          <View style={styles.emptyState}>
+            <Text style={styles.emptyStateText}>
+              No wound analyses yet. Take a photo to get started!
+            </Text>
           </View>
-
-          <View style={styles.timelineItem}>
-            <View style={styles.timelinePhoto}>
-              <Text style={styles.photoPlaceholder}>📸</Text>
-            </View>
-            <View style={styles.timelineContent}>
-              <Text style={styles.timelineDate}>2024-06-28 09:15</Text>
-              <Text style={styles.timelineStatus}>Healthy</Text>
-              <Text style={styles.timelineConfidence}>Confidence: 89%</Text>
-              <Text style={styles.timelineNote}>Good recovery progress</Text>
-              <Button
-                title="View Details"
-                variant="secondary"
-                onPress={() => {}}
-                style={styles.detailsButton}
-              />
-            </View>
-          </View>
-
-          <View style={styles.timelineItem}>
-            <View style={styles.timelinePhoto}>
-              <Text style={styles.photoPlaceholder}>📸</Text>
-            </View>
-            <View style={styles.timelineContent}>
-              <Text style={styles.timelineDate}>2024-06-27 16:45</Text>
-              <Text style={[styles.timelineStatus, styles.warningStatus]}>Monitor</Text>
-              <Text style={styles.timelineConfidence}>Confidence: 78%</Text>
-              <Text style={styles.timelineNote}>Minor inflammation detected</Text>
-              <Button
-                title="View Details"
-                variant="secondary"
-                onPress={() => {}}
-                style={styles.detailsButton}
-              />
-            </View>
-          </View>
-        </ScrollView>
-      </View>
+        }
+      />
     </ThemedView>
   );
 }
@@ -101,10 +150,9 @@ export default function HistoryScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
   },
   header: {
-    marginBottom: 24,
+    padding: 20,
   },
   title: {
     fontSize: 24,
@@ -117,101 +165,69 @@ const styles = StyleSheet.create({
     color: '#666',
     lineHeight: 24,
   },
-  stats: {
-    flexDirection: 'row',
-    gap: 12,
-    marginBottom: 32,
+  list: {
+    padding: 20,
   },
-  statCard: {
-    flex: 1,
-    backgroundColor: '#F5F7FF',
-    borderRadius: 16,
-    padding: 16,
-    alignItems: 'center',
-  },
-  statValue: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#1849D7',
-    marginBottom: 4,
-  },
-  statLabel: {
-    fontSize: 14,
-    color: '#666',
-    textAlign: 'center',
-  },
-  section: {
-    flex: 1,
-  },
-  sectionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: '#333',
-  },
-  viewButton: {
-    minWidth: 100,
-  },
-  timeline: {
-    flex: 1,
-  },
-  timelineItem: {
-    flexDirection: 'row',
-    backgroundColor: '#fff',
-    borderRadius: 16,
+  historyCard: {
+    backgroundColor: 'white',
+    borderRadius: 20,
     padding: 16,
     marginBottom: 16,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
+    shadowRadius: 8,
+    elevation: 3,
   },
-  timelinePhoto: {
-    width: 60,
-    height: 60,
-    backgroundColor: '#F5F7FF',
+  cardHeader: {
+    flexDirection: 'row',
+    gap: 16,
+  },
+  thumbnail: {
+    width: 80,
+    height: 80,
     borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 16,
   },
-  photoPlaceholder: {
-    fontSize: 24,
-  },
-  timelineContent: {
+  cardInfo: {
     flex: 1,
+    gap: 4,
   },
-  timelineDate: {
-    fontSize: 14,
-    color: '#666',
-    marginBottom: 4,
-  },
-  timelineStatus: {
-    fontSize: 16,
+  classification: {
+    fontSize: 18,
     fontWeight: '600',
-    color: '#22C55E',
-    marginBottom: 4,
+    color: '#1849D7',
   },
-  warningStatus: {
-    color: '#F59E0B',
-  },
-  timelineConfidence: {
+  timestamp: {
     fontSize: 14,
     color: '#666',
-    marginBottom: 4,
   },
-  timelineNote: {
-    fontSize: 14,
-    color: '#333',
-    marginBottom: 12,
+  urgencyContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginTop: 4,
   },
-  detailsButton: {
-    alignSelf: 'flex-start',
+  urgencyBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  urgencyText: {
+    color: 'white',
+    fontWeight: '600',
+    fontSize: 12,
+  },
+  hospitalIndicator: {
+    fontSize: 12,
+    color: '#FF4444',
+  },
+  emptyState: {
+    padding: 20,
+    alignItems: 'center',
+  },
+  emptyStateText: {
+    fontSize: 16,
+    color: '#666',
+    textAlign: 'center',
   },
 }); 

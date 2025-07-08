@@ -6,6 +6,7 @@ import {
   Text,
   TextStyle,
   TouchableOpacity,
+  View,
   ViewStyle,
 } from "react-native";
 
@@ -46,7 +47,7 @@ const Button: React.FC<ButtonProps> = ({
       activeOpacity={0.85}
       disabled={disabled || loading}
     >
-      {icon && <>{icon}</>}
+      {icon && <View>{icon}</View>}
       {loading ? (
         <ActivityIndicator
           color={variant === "primary" ? "#fff" : Colors.light.primary}
