@@ -1,10 +1,10 @@
-import { Ionicons } from '@expo/vector-icons';
-import { Tabs } from 'expo-router';
-import { Colors } from '../../constants/Colors';
-import { useColorScheme } from '../../hooks/useColorScheme';
+import { Ionicons } from "@expo/vector-icons";
+import { Tabs } from "expo-router";
+import { Colors } from "../../constants/Colors";
+import { useColorScheme } from "../../hooks/useColorScheme";
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme() ?? 'light';
+  const colorScheme = useColorScheme() ?? "light";
 
   return (
     <Tabs
@@ -14,32 +14,37 @@ export default function TabLayout() {
           backgroundColor: Colors[colorScheme].background,
         },
         headerTintColor: Colors[colorScheme].text,
-        tabBarStyle: { display: 'none' },
-        headerShown: false,
+        // headerShown: true,
       }}
     >
       <Tabs.Screen
         name="index"
         options={{
+          title: "Home",
           tabBarIcon: ({ color }) => <TabBarIcon name="home" color={color} />,
         }}
       />
       <Tabs.Screen
         name="capture"
         options={{
+          title: "Capture",
           tabBarIcon: ({ color }) => <TabBarIcon name="camera" color={color} />,
         }}
       />
       <Tabs.Screen
         name="history"
         options={{
+          title: "History",
           tabBarIcon: ({ color }) => <TabBarIcon name="time" color={color} />,
         }}
       />
       <Tabs.Screen
         name="hospitals"
         options={{
-          tabBarIcon: ({ color }) => <TabBarIcon name="medical" color={color} />,
+          title: "Hospitals",
+          tabBarIcon: ({ color }) => (
+            <TabBarIcon name="medical" color={color} />
+          ),
         }}
       />
     </Tabs>
@@ -47,7 +52,7 @@ export default function TabLayout() {
 }
 
 function TabBarIcon(props: {
-  name: React.ComponentProps<typeof Ionicons>['name'];
+  name: React.ComponentProps<typeof Ionicons>["name"];
   color: string;
 }) {
   return <Ionicons size={28} style={{ marginBottom: -3 }} {...props} />;

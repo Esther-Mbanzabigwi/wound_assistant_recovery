@@ -10,19 +10,10 @@ export default function RootLayout() {
       <SafeAreaView
         style={{ flex: 1, backgroundColor: Colors.dark.background }}
       >
-        <StatusBar style="dark" backgroundColor={Colors.light.background} />
+        <StatusBar style="light" backgroundColor={Colors.light.background} />
         <Stack
           screenOptions={{
-            headerStyle: {
-              backgroundColor: Colors.light.background,
-            },
-            headerTintColor: Colors.light.text,
-            headerTitleStyle: {
-              fontWeight: "600",
-            },
-            contentStyle: {
-              backgroundColor: Colors.light.background,
-            },
+            headerShown: false,
           }}
         >
           <Stack.Screen
@@ -32,7 +23,7 @@ export default function RootLayout() {
             }}
           />
           <Stack.Screen
-            name="(app)"
+            name="(tabs)"
             options={{
               headerShown: false,
             }}
