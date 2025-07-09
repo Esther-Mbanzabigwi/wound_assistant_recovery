@@ -4,8 +4,9 @@ export interface AuthContextType {
   user: IUser | null;
   token: string | null;
   isInitialized: boolean;
+  hasSeenOnboarding: boolean;
   login: (userInfo: { identifier: string; password: string }) => Promise<IUser>;
-  logout: () => void;
+  logout: () => Promise<void>;
   register: (userInfo: {
     username: string;
     email: string;
@@ -13,4 +14,5 @@ export interface AuthContextType {
     password: string;
     profile?: File;
   }) => Promise<void>;
+  completeOnboarding: () => Promise<void>;
 }

@@ -16,11 +16,13 @@ const AuthContext = createContext<AuthContextType>({
   user: null,
   token: null,
   isInitialized: false,
+  hasSeenOnboarding: false,
   login: async () => {
     throw new Error("Auth context not initialized");
   },
-  logout: () => {},
+  logout: async () => {},
   register: async () => {},
+  completeOnboarding: async () => {},
 });
 
 export function useAuthContext() {
@@ -35,13 +37,15 @@ export default function AuthContextProvider({ children }: ProviderProps) {
   const [user, setUser] = useState<IUser | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [isInitialized, setIsInitialized] = useState(false);
+  const [hasSeenOnboarding, setHasSeenOnboarding] = useState(false);
 
   useEffect(() => {
     const loadStoredAuth = async () => {
       try {
-        const [token, currentUser] = await Promise.all([
+        const [token, currentUser, onboardingStatus] = await Promise.all([
           AsyncStorage.getItem("token"),
           AsyncStorage.getItem("user"),
+          AsyncStorage.getItem("hasSeenOnboarding"),
         ]);
 
         if (token && currentUser) {
@@ -55,6 +59,8 @@ export default function AuthContextProvider({ children }: ProviderProps) {
             AsyncStorage.removeItem("user"),
           ]);
         }
+
+        setHasSeenOnboarding(onboardingStatus === "true");
       } catch (error) {
         console.error("Error loading stored auth:", error);
         setUser(null);
@@ -108,15 +114,22 @@ export default function AuthContextProvider({ children }: ProviderProps) {
     }
   }
 
+  async function completeOnboarding() {
+    setHasSeenOnboarding(true);
+    await AsyncStorage.setItem("hasSeenOnboarding", "true");
+  }
+
   const values = useMemo(() => {
     return {
       user,
       token,
       isInitialized,
+      hasSeenOnboarding,
       login,
       logout,
       register,
+      completeOnboarding,
     };
-  }, [user, token, isInitialized]);
+  }, [user, token, isInitialized, hasSeenOnboarding]);
   return <AuthContext.Provider value={values}>{children}</AuthContext.Provider>;
 }
