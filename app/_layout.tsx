@@ -8,9 +8,9 @@ export default function RootLayout() {
   return (
     <AuthContextProvider>
       <SafeAreaView
-        style={{ flex: 1, backgroundColor: Colors.dark.background }}
+        style={{ flex: 1, backgroundColor: Colors.light.background }}
       >
-        <StatusBar style="light" backgroundColor={Colors.light.background} />
+        <StatusBar style="dark" />
         <Stack
           screenOptions={{
             headerShown: false,
