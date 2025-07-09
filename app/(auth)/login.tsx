@@ -1,15 +1,31 @@
-import { useFocusEffect } from '@react-navigation/native';
-import { Link, router } from 'expo-router';
-import React, { useState } from 'react';
-import { Animated, Image, ImageBackground, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import Button from '../../components/ui/Button';
-import Input from '../../components/ui/Input';
+import { useAuthContext } from "@/context/authcontext";
+import { useFocusEffect } from "@react-navigation/native";
+import { Link, router } from "expo-router";
+import React, { useState } from "react";
+import {
+  Alert,
+  Animated,
+  Image,
+  ImageBackground,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import Button from "../../components/ui/Button";
+import Input from "../../components/ui/Input";
 
 export default function LoginScreen() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+
   const fadeAnim = React.useRef(new Animated.Value(0)).current;
   const slideAnim = React.useRef(new Animated.Value(50)).current;
+
+  const { login } = useAuthContext();
 
   useFocusEffect(
     React.useCallback(() => {
@@ -30,23 +46,78 @@ export default function LoginScreen() {
         fadeAnim.setValue(0);
         slideAnim.setValue(50);
       };
-    }, [])
+    }, [fadeAnim, slideAnim])
   );
 
-  const handleLogin = () => {
-    // TODO: Implement actual login logic
-    router.replace('/(tabs)');
+  // Form validation function
+  const validateForm = (): boolean => {
+    const newErrors: Record<string, string> = {};
+
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email.trim()) {
+      newErrors.email = "Email is required";
+    } else if (!emailRegex.test(email)) {
+      newErrors.email = "Please enter a valid email address";
+    }
+
+    // Password validation
+    if (!password) {
+      newErrors.password = "Password is required";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleLogin = async () => {
+    if (!validateForm()) {
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const loginData = {
+        identifier: email.trim(),
+        password: password,
+      };
+
+      await login(loginData);
+
+      router.replace("/(tabs)");
+    } catch (error: any) {
+      console.log(JSON.stringify(error));
+      let errorMessage =
+        "Login failed. Please check your credentials and try again.";
+
+      if (error.response?.data?.error?.message) {
+        errorMessage = error.response.data.error.message;
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+
+      Alert.alert("Login Error", errorMessage);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Clear error when user starts typing
+  const clearError = (field: string) => {
+    if (errors[field]) {
+      setErrors((prev) => ({ ...prev, [field]: "" }));
+    }
   };
 
   return (
     <ImageBackground
-      source={require('../../assets/images/mother.png')}
+      source={require("../../assets/images/mother.png")}
       resizeMode="cover"
       style={styles.backgroundImage}
     >
       <View style={styles.overlay}>
-        <ScrollView 
-          style={styles.container} 
+        <ScrollView
+          style={styles.container}
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
         >
@@ -56,7 +127,7 @@ export default function LoginScreen() {
             </Link>
           </TouchableOpacity>
 
-          <Animated.View 
+          <Animated.View
             style={[
               styles.card,
               {
@@ -68,13 +139,15 @@ export default function LoginScreen() {
             <View style={styles.logo}>
               <View style={styles.iconContainer}>
                 <Image
-                  source={require('../../assets/images/baby_hand.png')}
+                  source={require("../../assets/images/baby_hand.png")}
                   style={styles.iconImage}
                   resizeMode="cover"
                 />
               </View>
               <Text style={styles.welcomeText}>Welcome Back</Text>
-              <Text style={styles.subtitle}>Continue your recovery journey</Text>
+              <Text style={styles.subtitle}>
+                Continue your recovery journey
+              </Text>
             </View>
 
             <View style={styles.form}>
@@ -83,11 +156,18 @@ export default function LoginScreen() {
                 <Input
                   placeholder="your.email@example.com"
                   value={email}
-                  onChangeText={setEmail}
+                  onChangeText={(text) => {
+                    setEmail(text);
+                    clearError("email");
+                  }}
                   keyboardType="email-address"
                   autoCapitalize="none"
                   icon="mail"
+                  error={errors.email}
                 />
+                {errors.email && (
+                  <Text style={styles.errorText}>{errors.email}</Text>
+                )}
               </View>
 
               <View style={styles.inputGroup}>
@@ -95,12 +175,21 @@ export default function LoginScreen() {
                 <Input
                   placeholder="••••••••"
                   value={password}
-                  onChangeText={setPassword}
+                  onChangeText={(text) => {
+                    setPassword(text);
+                    clearError("password");
+                  }}
                   secureTextEntry
                   icon="lock"
+                  error={errors.password}
                 />
+                {errors.password && (
+                  <Text style={styles.errorText}>{errors.password}</Text>
+                )}
                 <TouchableOpacity style={styles.forgotPassword}>
-                  <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
+                  <Text style={styles.forgotPasswordText}>
+                    Forgot Password?
+                  </Text>
                 </TouchableOpacity>
               </View>
 
@@ -108,11 +197,14 @@ export default function LoginScreen() {
                 variant="primary"
                 onPress={handleLogin}
                 style={styles.button}
-                title="Sign In"
+                title={isLoading ? "Signing In..." : "Sign In"}
+                disabled={isLoading}
               />
 
               <View style={styles.footer}>
-                <Text style={styles.footerText}>Don't have an account? </Text>
+                <Text style={styles.footerText}>
+                  Don&apos;t have an account?{" "}
+                </Text>
                 <Link href="/(auth)/register">
                   <Text style={styles.footerLink}>Sign up here</Text>
                 </Link>
@@ -128,12 +220,12 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
   backgroundImage: {
     flex: 1,
-    width: '100%',
-    height: '100%',
+    width: "100%",
+    height: "100%",
   },
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(255, 255, 255, 0.15)',
+    backgroundColor: "rgba(255, 255, 255, 0.15)",
   },
   container: {
     flex: 1,
@@ -141,70 +233,70 @@ const styles = StyleSheet.create({
   scrollContent: {
     padding: 20,
     paddingTop: 40,
-    minHeight: '100%',
+    minHeight: "100%",
   },
   backLink: {
     marginBottom: 20,
     padding: 8,
   },
   backText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 18,
-    textShadowColor: 'rgba(0, 0, 0, 0.3)',
+    textShadowColor: "rgba(0, 0, 0, 0.3)",
     textShadowOffset: { width: 1, height: 1 },
     textShadowRadius: 2,
   },
   card: {
-    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+    backgroundColor: "rgba(255, 255, 255, 0.95)",
     borderRadius: 24,
     padding: 28,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.2,
     shadowRadius: 12,
     elevation: 5,
-    borderColor: 'rgba(255, 255, 255, 0.5)',
+    borderColor: "rgba(255, 255, 255, 0.5)",
     borderWidth: 1,
   },
   logo: {
-    alignItems: 'center',
+    alignItems: "center",
     marginBottom: 32,
   },
   iconContainer: {
     width: 90,
     height: 90,
     borderRadius: 45,
-    backgroundColor: 'rgba(255, 241, 237, 0.95)',
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: "rgba(255, 241, 237, 0.95)",
+    alignItems: "center",
+    justifyContent: "center",
     marginBottom: 20,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.15,
     shadowRadius: 6,
     elevation: 3,
-    overflow: 'hidden',
-    borderColor: 'rgba(255, 255, 255, 0.8)',
+    overflow: "hidden",
+    borderColor: "rgba(255, 255, 255, 0.8)",
     borderWidth: 2,
   },
   iconImage: {
-    width: '100%',
-    height: '100%',
+    width: "100%",
+    height: "100%",
     opacity: 0.9,
   },
   welcomeText: {
     fontSize: 32,
-    fontWeight: 'bold',
-    color: '#8B4D47',
+    fontWeight: "bold",
+    color: "#8B4D47",
     marginBottom: 8,
-    textShadowColor: 'rgba(255, 255, 255, 0.8)',
+    textShadowColor: "rgba(255, 255, 255, 0.8)",
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 2,
   },
   subtitle: {
     fontSize: 17,
-    color: '#666',
-    textAlign: 'center',
+    color: "#666",
+    textAlign: "center",
     lineHeight: 24,
   },
   form: {
@@ -215,38 +307,43 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 16,
-    fontWeight: '600',
-    color: '#8B4D47',
+    fontWeight: "600",
+    color: "#8B4D47",
     marginLeft: 4,
   },
-  forgotPassword: {
-    alignSelf: 'flex-end',
-    marginTop: 4,
-    padding: 4,
-  },
-  forgotPasswordText: {
-    color: '#8B4D47',
+  errorText: {
+    color: "#e74c3c",
     fontSize: 14,
-    fontWeight: '500',
+    marginLeft: 4,
+    marginTop: 4,
   },
   button: {
     marginTop: 8,
     borderRadius: 16,
     height: 56,
   },
+  forgotPassword: {
+    alignSelf: "flex-end",
+    marginTop: 8,
+  },
+  forgotPasswordText: {
+    color: "#8B4D47",
+    fontSize: 14,
+    fontWeight: "500",
+  },
   footer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
+    flexDirection: "row",
+    justifyContent: "center",
     marginTop: 20,
     paddingVertical: 8,
   },
   footerText: {
-    color: '#666',
+    color: "#666",
     fontSize: 15,
   },
   footerLink: {
-    color: '#8B4D47',
-    fontWeight: '600',
+    color: "#8B4D47",
+    fontWeight: "600",
     fontSize: 15,
   },
 });

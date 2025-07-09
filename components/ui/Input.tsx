@@ -8,10 +8,11 @@ import {
   View,
   ViewStyle,
 } from "react-native";
+import { IconSymbol } from "./IconSymbol";
 
 interface InputProps {
   label?: string;
-  icon?: React.ReactNode;
+  icon?: string;
   value: string;
   onChangeText: (text: string) => void;
   placeholder?: string;
@@ -22,6 +23,7 @@ interface InputProps {
   autoCapitalize?: "none" | "sentences" | "words" | "characters";
   multiline?: boolean;
   numberOfLines?: number;
+  error?: string;
 }
 
 const Input: React.FC<InputProps> = ({
@@ -37,12 +39,21 @@ const Input: React.FC<InputProps> = ({
   autoCapitalize = "none",
   multiline = false,
   numberOfLines = 1,
+  error,
 }) => {
   return (
     <View style={[styles.container, style]}>
       {label && <Text style={styles.label}>{label}</Text>}
-      <View style={styles.inputWrapper}>
-        {icon && <View style={styles.icon}>{icon}</View>}
+      <View style={[styles.inputWrapper, error && styles.inputWrapperError]}>
+        {icon && (
+          <View style={styles.icon}>
+            <IconSymbol
+              name={icon as any}
+              size={20}
+              color={error ? "#e74c3c" : Colors.light.gray[400]}
+            />
+          </View>
+        )}
         <TextInput
           style={[styles.input, inputStyle]}
           value={value}
@@ -79,6 +90,10 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderWidth: 1,
     borderColor: Colors.light.border,
+  },
+  inputWrapperError: {
+    borderColor: "#e74c3c",
+    backgroundColor: "#fdf2f2",
   },
   icon: {
     marginRight: 12,

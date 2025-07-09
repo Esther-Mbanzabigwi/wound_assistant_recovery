@@ -9,8 +9,13 @@ import strapi from "./strapi";
 
 export const UserHandler = {
   async logIn(user: ILogInUser): Promise<ILoginResponse> {
-    const { data } = await strapi.post("/auth/local", user);
-    return data;
+    try {
+      const { data } = await strapi.post("/auth/local", user);
+      return data;
+    } catch (error) {
+      console.log(JSON.stringify(error));
+      throw error;
+    }
   },
 
   async register(user: IRegisterUser): Promise<ILoginResponse> {
@@ -19,6 +24,7 @@ export const UserHandler = {
       ...user,
       profile: image?.id || null,
     });
+
     return data;
   },
 

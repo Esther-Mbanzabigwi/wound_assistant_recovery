@@ -2,9 +2,13 @@
 const { defineConfig } = require('eslint/config');
 const expoConfig = require('eslint-config-expo/flat');
 
+// remove the errror or import React from 'react'
+
+
 module.exports = defineConfig([
   expoConfig,
   {
     ignores: ['dist/*'],
   },
+  
 ]);

@@ -1,5 +1,3 @@
-import type { IImage } from "./imageType";
-
 export type UserRole = "authenticated" | "admin" | "user";
 
 export interface IUser {
@@ -7,9 +5,7 @@ export interface IUser {
   documentId: string;
   username: string;
   email: string;
-  profile: IImage;
   phone?: string;
-  userRole: UserRole;
   createdAt: string;
 }
 

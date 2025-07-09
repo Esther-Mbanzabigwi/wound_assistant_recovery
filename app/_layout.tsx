@@ -6,8 +6,10 @@ import { SafeAreaView } from "react-native";
 
 export default function RootLayout() {
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: Colors.dark.background }}>
-      <AuthContextProvider>
+    <AuthContextProvider>
+      <SafeAreaView
+        style={{ flex: 1, backgroundColor: Colors.dark.background }}
+      >
         <StatusBar style="dark" backgroundColor={Colors.light.background} />
         <Stack
           screenOptions={{
@@ -36,7 +38,7 @@ export default function RootLayout() {
             }}
           />
         </Stack>
-      </AuthContextProvider>
-    </SafeAreaView>
+      </SafeAreaView>
+    </AuthContextProvider>
   );
 }

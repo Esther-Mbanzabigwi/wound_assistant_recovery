@@ -1,3 +1,4 @@
+import { UserHandler } from "@/api/userapi";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
 import {
@@ -8,7 +9,6 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { API } from "../api";
 import type { AuthContextType } from "../types/context.type";
 import type { ILogInUser, IRegisterUser, IUser } from "../types/usertype";
 
@@ -69,13 +69,14 @@ export default function AuthContextProvider({ children }: ProviderProps) {
 
   async function login(userInfo: ILogInUser) {
     try {
-      const response = await API.userHandler.logIn(userInfo);
+      const response = await UserHandler.logIn(userInfo);
       setToken(response.jwt);
       await AsyncStorage.setItem("token", response.jwt);
-      const user = await API.userHandler.getLoginUser(response.user.id);
-      setUser(user);
-      await Promise.all([AsyncStorage.setItem("user", JSON.stringify(user))]);
-      return user;
+      setUser(response.user);
+      await Promise.all([
+        AsyncStorage.setItem("user", JSON.stringify(response.user)),
+      ]);
+      return response.user;
     } catch (error) {
       console.error("Error during login:", error);
       throw new Error("An error occurred. Please try again later");
@@ -94,7 +95,7 @@ export default function AuthContextProvider({ children }: ProviderProps) {
 
   async function register(userInfo: IRegisterUser) {
     try {
-      const response = await API.userHandler.register(userInfo);
+      const response = await UserHandler.register(userInfo);
       setUser(response.user);
       setToken(response.jwt);
       await Promise.all([
