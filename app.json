@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "wound_assistant_recovery",
-    "slug": "wound_assistant_recovery",
+    "slug": "mothermend",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -9,14 +9,18 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "runtimeVersion": {
+        "policy": "appVersion"
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "runtimeVersion": "1.0.0"
     },
     "web": {
       "bundler": "metro",
@@ -37,6 +41,16 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "0136a517-55de-4a2c-b0fb-86051d657a25"
+      }
+    },
+    "owner": "esther-faith",
+    "updates": {
+      "url": "https://u.expo.dev/0136a517-55de-4a2c-b0fb-86051d657a25"
     }
   }
 }
