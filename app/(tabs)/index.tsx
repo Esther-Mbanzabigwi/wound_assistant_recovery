@@ -1,37 +1,38 @@
 import { Link } from "expo-router";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
-import { ThemedView } from "../../components/ThemedView";
+import { StyleSheet, Text, View } from "react-native";
+import AppLayout from "../../components/AppLayout";
 import Button from "../../components/ui/Button";
+import { SharedStyles } from "../../constants/SharedStyles";
 import { useAuthContext } from "../../context/authcontext";
 
 export default function OverviewScreen() {
   const { user, logout } = useAuthContext();
 
   return (
-    <ThemedView style={styles.container}>
+    <AppLayout>
       <View style={styles.header}>
-        <Text style={styles.title}>
+        <Text style={SharedStyles.title}>
           Welcome back, {user?.username || "User"}!
         </Text>
-        <Text style={styles.subtitle}>
+        <Text style={SharedStyles.subtitle}>
           Track your recovery progress and stay healthy
         </Text>
       </View>
 
-      <ScrollView style={styles.content}>
-        <View style={styles.statusCard}>
+      <View style={styles.content}>
+        <View style={[SharedStyles.card, styles.statusCard]}>
           <View style={styles.statusHeader}>
-            <Text style={styles.statusTitle}>Recovery Status</Text>
-            <View style={styles.statusBadge}>
-              <Text style={styles.statusText}>Healthy</Text>
+            <Text style={SharedStyles.sectionTitle}>Recovery Status</Text>
+            <View style={[SharedStyles.badge, SharedStyles.badgeSuccess]}>
+              <Text style={[SharedStyles.badgeText, SharedStyles.badgeTextSuccess]}>Healthy</Text>
             </View>
           </View>
           <Text style={styles.lastChecked}>Last checked 2 hours ago</Text>
         </View>
 
-        <View style={styles.metricsGrid}>
-          <View style={styles.metricCard}>
-            <View style={styles.metricIcon}>
+        <View style={SharedStyles.grid}>
+          <View style={[SharedStyles.card, styles.metricCard]}>
+            <View style={SharedStyles.activityIcon}>
               <Text>🗓️</Text>
             </View>
             <Text style={styles.metricValue}>12</Text>
@@ -39,8 +40,8 @@ export default function OverviewScreen() {
             <Text style={styles.metricStatus}>Recovery on track</Text>
           </View>
 
-          <View style={styles.metricCard}>
-            <View style={styles.metricIcon}>
+          <View style={[SharedStyles.card, styles.metricCard]}>
+            <View style={SharedStyles.activityIcon}>
               <Text>📸</Text>
             </View>
             <Text style={styles.metricValue}>8</Text>
@@ -50,8 +51,8 @@ export default function OverviewScreen() {
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Quick Actions</Text>
-          <Text style={styles.sectionSubtitle}>
+          <Text style={SharedStyles.sectionTitle}>Quick Actions</Text>
+          <Text style={SharedStyles.sectionSubtitle}>
             Common tasks for your recovery tracking
           </Text>
 
@@ -93,10 +94,10 @@ export default function OverviewScreen() {
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Recent Activity</Text>
+          <Text style={SharedStyles.sectionTitle}>Recent Activity</Text>
           <View style={styles.activityList}>
-            <View style={styles.activityItem}>
-              <View style={styles.activityIcon}>
+            <View style={SharedStyles.activityItem}>
+              <View style={SharedStyles.activityIcon}>
                 <Text>✅</Text>
               </View>
               <View style={styles.activityContent}>
@@ -107,8 +108,8 @@ export default function OverviewScreen() {
               </View>
             </View>
 
-            <View style={styles.activityItem}>
-              <View style={styles.activityIcon}>
+            <View style={SharedStyles.activityItem}>
+              <View style={SharedStyles.activityIcon}>
                 <Text>📸</Text>
               </View>
               <View style={styles.activityContent}>
@@ -117,8 +118,8 @@ export default function OverviewScreen() {
               </View>
             </View>
 
-            <View style={styles.activityItem}>
-              <View style={styles.activityIcon}>
+            <View style={SharedStyles.activityItem}>
+              <View style={SharedStyles.activityIcon}>
                 <Text>✅</Text>
               </View>
               <View style={styles.activityContent}>
@@ -130,44 +131,20 @@ export default function OverviewScreen() {
             </View>
           </View>
         </View>
-      </ScrollView>
-    </ThemedView>
+      </View>
+    </AppLayout>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
   header: {
-    padding: 20,
-    paddingBottom: 16,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "#1849D7",
-    marginBottom: 8,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: "#666",
+    marginBottom: 16,
   },
   content: {
     flex: 1,
-    padding: 20,
-    paddingTop: 0,
   },
   statusCard: {
-    backgroundColor: "#fff",
-    borderRadius: 16,
-    padding: 16,
     marginBottom: 24,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
   },
   statusHeader: {
     flexDirection: "row",
@@ -175,45 +152,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 8,
   },
-  statusTitle: {
-    fontSize: 18,
-    fontWeight: "600",
-    color: "#333",
-  },
-  statusBadge: {
-    backgroundColor: "#DCFCE7",
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 20,
-  },
-  statusText: {
-    color: "#22C55E",
-    fontWeight: "600",
-  },
   lastChecked: {
     fontSize: 14,
     color: "#666",
   },
-  metricsGrid: {
-    flexDirection: "row",
-    gap: 16,
-    marginBottom: 32,
-  },
   metricCard: {
     flex: 1,
     backgroundColor: "#F5F7FF",
-    borderRadius: 16,
-    padding: 16,
     alignItems: "center",
-  },
-  metricIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 12,
   },
   metricValue: {
     fontSize: 24,
@@ -235,17 +181,6 @@ const styles = StyleSheet.create({
   section: {
     marginBottom: 32,
   },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: "600",
-    color: "#333",
-    marginBottom: 8,
-  },
-  sectionSubtitle: {
-    fontSize: 14,
-    color: "#666",
-    marginBottom: 16,
-  },
   actionGrid: {
     gap: 12,
   },
@@ -254,19 +189,6 @@ const styles = StyleSheet.create({
   },
   activityList: {
     gap: 16,
-  },
-  activityItem: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  activityIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: "#F5F7FF",
-    alignItems: "center",
-    justifyContent: "center",
-    marginRight: 12,
   },
   activityContent: {
     flex: 1,

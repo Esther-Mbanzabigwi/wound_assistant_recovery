@@ -3,18 +3,20 @@ import { useFocusEffect } from "@react-navigation/native";
 import { Link, router } from "expo-router";
 import React, { useState } from "react";
 import {
-  Alert,
-  Animated,
-  Image,
-  ImageBackground,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
+    Alert,
+    Animated,
+    Image,
+    ImageBackground,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
 } from "react-native";
 import Button from "../../components/ui/Button";
 import Input from "../../components/ui/Input";
+import { Colors } from "../../constants/Colors";
+import { SharedStyles } from "../../constants/SharedStyles";
 
 export default function LoginScreen() {
   const [email, setEmail] = useState("");
@@ -117,7 +119,7 @@ export default function LoginScreen() {
     >
       <View style={styles.overlay}>
         <ScrollView
-          style={styles.container}
+          style={SharedStyles.container}
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
         >
@@ -129,7 +131,8 @@ export default function LoginScreen() {
 
           <Animated.View
             style={[
-              styles.card,
+              SharedStyles.card,
+              styles.authCard,
               {
                 opacity: fadeAnim,
                 transform: [{ translateY: slideAnim }],
@@ -144,15 +147,15 @@ export default function LoginScreen() {
                   resizeMode="cover"
                 />
               </View>
-              <Text style={styles.welcomeText}>Welcome Back</Text>
-              <Text style={styles.subtitle}>
+              <Text style={[SharedStyles.title, styles.welcomeText]}>Welcome Back</Text>
+              <Text style={SharedStyles.subtitle}>
                 Continue your recovery journey
               </Text>
             </View>
 
             <View style={styles.form}>
-              <View style={styles.inputGroup}>
-                <Text style={styles.label}>Email</Text>
+              <View style={SharedStyles.formGroup}>
+                <Text style={SharedStyles.label}>Email</Text>
                 <Input
                   placeholder="your.email@example.com"
                   value={email}
@@ -166,12 +169,12 @@ export default function LoginScreen() {
                   error={errors.email}
                 />
                 {errors.email && (
-                  <Text style={styles.errorText}>{errors.email}</Text>
+                  <Text style={SharedStyles.errorText}>{errors.email}</Text>
                 )}
               </View>
 
-              <View style={styles.inputGroup}>
-                <Text style={styles.label}>Password</Text>
+              <View style={SharedStyles.formGroup}>
+                <Text style={SharedStyles.label}>Password</Text>
                 <Input
                   placeholder="••••••••"
                   value={password}
@@ -184,7 +187,7 @@ export default function LoginScreen() {
                   error={errors.password}
                 />
                 {errors.password && (
-                  <Text style={styles.errorText}>{errors.password}</Text>
+                  <Text style={SharedStyles.errorText}>{errors.password}</Text>
                 )}
                 <TouchableOpacity style={styles.forgotPassword}>
                   <Text style={styles.forgotPasswordText}>
@@ -227,9 +230,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "rgba(255, 255, 255, 0.15)",
   },
-  container: {
-    flex: 1,
-  },
   scrollContent: {
     padding: 20,
     paddingTop: 40,
@@ -246,15 +246,9 @@ const styles = StyleSheet.create({
     textShadowOffset: { width: 1, height: 1 },
     textShadowRadius: 2,
   },
-  card: {
+  authCard: {
     backgroundColor: "rgba(255, 255, 255, 0.95)",
-    borderRadius: 24,
     padding: 28,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 12,
-    elevation: 5,
     borderColor: "rgba(255, 255, 255, 0.5)",
     borderWidth: 1,
   },
@@ -285,37 +279,13 @@ const styles = StyleSheet.create({
     opacity: 0.9,
   },
   welcomeText: {
-    fontSize: 32,
-    fontWeight: "bold",
-    color: "#8B4D47",
-    marginBottom: 8,
+    color: Colors.light.primary,
     textShadowColor: "rgba(255, 255, 255, 0.8)",
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 2,
   },
-  subtitle: {
-    fontSize: 17,
-    color: "#666",
-    textAlign: "center",
-    lineHeight: 24,
-  },
   form: {
     gap: 24,
-  },
-  inputGroup: {
-    gap: 8,
-  },
-  label: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#8B4D47",
-    marginLeft: 4,
-  },
-  errorText: {
-    color: "#e74c3c",
-    fontSize: 14,
-    marginLeft: 4,
-    marginTop: 4,
   },
   button: {
     marginTop: 8,
@@ -327,7 +297,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   forgotPasswordText: {
-    color: "#8B4D47",
+    color: Colors.light.primary,
     fontSize: 14,
     fontWeight: "500",
   },
@@ -338,11 +308,11 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
   },
   footerText: {
-    color: "#666",
+    color: Colors.light.gray[500],
     fontSize: 15,
   },
   footerLink: {
-    color: "#8B4D47",
+    color: Colors.light.primary,
     fontWeight: "600",
     fontSize: 15,
   },

@@ -1,13 +1,14 @@
 import { Colors } from "@/constants/Colors";
 import React from "react";
 import {
-  StyleSheet,
-  Text,
-  TextInput,
-  TextStyle,
-  View,
-  ViewStyle,
+    StyleSheet,
+    Text,
+    TextInput,
+    TextStyle,
+    View,
+    ViewStyle,
 } from "react-native";
+import { SharedStyles } from "../../constants/SharedStyles";
 import { IconSymbol } from "./IconSymbol";
 
 interface InputProps {
@@ -42,15 +43,15 @@ const Input: React.FC<InputProps> = ({
   error,
 }) => {
   return (
-    <View style={[styles.container, style]}>
-      {label && <Text style={styles.label}>{label}</Text>}
+    <View style={[SharedStyles.formGroup, style]}>
+      {label && <Text style={SharedStyles.label}>{label}</Text>}
       <View style={[styles.inputWrapper, error && styles.inputWrapperError]}>
         {icon && (
           <View style={styles.icon}>
             <IconSymbol
               name={icon as any}
               size={20}
-              color={error ? "#e74c3c" : Colors.light.gray[400]}
+              color={error ? Colors.light.danger : Colors.light.gray[400]}
             />
           </View>
         )}
@@ -72,15 +73,6 @@ const Input: React.FC<InputProps> = ({
 };
 
 const styles = StyleSheet.create({
-  container: {
-    marginBottom: 16,
-  },
-  label: {
-    fontSize: 15,
-    fontWeight: "500",
-    marginBottom: 8,
-    color: Colors.light.text,
-  },
   inputWrapper: {
     flexDirection: "row",
     alignItems: "center",
@@ -92,7 +84,7 @@ const styles = StyleSheet.create({
     borderColor: Colors.light.border,
   },
   inputWrapperError: {
-    borderColor: "#e74c3c",
+    borderColor: Colors.light.danger,
     backgroundColor: "#fdf2f2",
   },
   icon: {

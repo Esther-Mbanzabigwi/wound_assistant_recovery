@@ -2,14 +2,14 @@ import { Colors } from "@/constants/Colors";
 import { useAuthContext } from "@/context/authcontext";
 import { router } from "expo-router";
 import {
-  Dimensions,
-  Image,
-  SafeAreaView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
+    Dimensions,
+    Image,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
 } from "react-native";
+import AppLayout from "./AppLayout";
 
 const { width, height } = Dimensions.get("window");
 
@@ -49,7 +49,7 @@ export default function OnboardingScreen({
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <AppLayout showIcon={false} scrollEnabled={false}>
       {/* Skip Button */}
       {showSkip && (
         <TouchableOpacity style={styles.skipButton} onPress={handleSkip}>
@@ -89,18 +89,14 @@ export default function OnboardingScreen({
           </Text>
         </TouchableOpacity>
       </View>
-    </SafeAreaView>
+    </AppLayout>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.light.background,
-  },
   skipButton: {
     position: "absolute",
-    top: 60,
+    top: 20,
     right: 20,
     zIndex: 1,
   },
@@ -113,7 +109,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
-    marginTop: 80,
+    marginTop: 40,
     marginBottom: 40,
   },
   dot: {

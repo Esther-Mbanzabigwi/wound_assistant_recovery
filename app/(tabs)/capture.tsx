@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, Image, ActivityIndicator, Alert } from 'react-native';
-import { ThemedView } from '../../components/ThemedView';
-import Button from '../../components/ui/Button';
 import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
+import { useEffect, useState } from 'react';
+import { ActivityIndicator, Alert, Image, StyleSheet, Text, View } from 'react-native';
 import api from '../../api';
+import AppLayout from '../../components/AppLayout';
+import Button from '../../components/ui/Button';
+import { Colors } from '../../constants/Colors';
 
 export default function CaptureScreen() {
   const [image, setImage] = useState<string | null>(null);
@@ -99,7 +100,7 @@ export default function CaptureScreen() {
   };
 
   return (
-    <ThemedView style={styles.container}>
+    <AppLayout scrollEnabled={false}>
       <View style={styles.captureArea}>
         {image ? (
           <View style={styles.imagePreview}>
@@ -114,7 +115,7 @@ export default function CaptureScreen() {
 
         {loading ? (
           <View style={styles.loading}>
-            <ActivityIndicator size="large" color="#D23669" />
+            <ActivityIndicator size="large" color={Colors.light.primary} />
             <Text style={styles.loadingText}>Processing your photo...</Text>
           </View>
         ) : (
@@ -135,22 +136,18 @@ export default function CaptureScreen() {
           </View>
         )}
       </View>
-    </ThemedView>
+    </AppLayout>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-  },
   captureArea: {
     flex: 1,
     justifyContent: 'center',
     gap: 32,
   },
   cameraPlaceholder: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.light.card,
     borderRadius: 20,
     padding: 40,
     alignItems: 'center',
@@ -167,12 +164,12 @@ const styles = StyleSheet.create({
   },
   captureText: {
     fontSize: 18,
-    color: '#D23669',
+    color: Colors.light.primary,
     fontWeight: '600',
     textAlign: 'center',
   },
   imagePreview: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.light.card,
     borderRadius: 20,
     overflow: 'hidden',
     aspectRatio: 4/3,
@@ -194,7 +191,7 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   orText: {
-    color: '#666',
+    color: Colors.light.gray[500],
     fontSize: 16,
   },
   loading: {
@@ -203,6 +200,6 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     fontSize: 16,
-    color: '#666',
+    color: Colors.light.gray[500],
   },
 }); 

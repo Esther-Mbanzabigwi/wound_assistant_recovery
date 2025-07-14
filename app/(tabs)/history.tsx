@@ -1,8 +1,10 @@
-import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, FlatList, Image, TouchableOpacity, RefreshControl } from 'react-native';
 import { useRouter } from 'expo-router';
-import { ThemedView } from '../../components/ThemedView';
+import { useEffect, useState } from 'react';
+import { FlatList, Image, RefreshControl, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import api from '../../api';
+import AppLayout from '../../components/AppLayout';
+import { Colors } from '../../constants/Colors';
+import { SharedStyles } from '../../constants/SharedStyles';
 
 interface PredictionHistory {
   id: number;
@@ -44,13 +46,13 @@ export default function HistoryScreen() {
   const getUrgencyColor = (level: string) => {
     switch (level.toUpperCase()) {
       case 'HIGH':
-        return '#FF4444';
+        return Colors.light.danger;
       case 'MEDIUM':
-        return '#FFA500';
+        return Colors.light.warning;
       case 'LOW':
-        return '#44BB44';
+        return Colors.light.success;
       default:
-        return '#666666';
+        return Colors.light.gray[500];
     }
   };
 
@@ -67,7 +69,7 @@ export default function HistoryScreen() {
 
   const renderItem = ({ item }: { item: PredictionHistory }) => (
     <TouchableOpacity
-      style={styles.historyCard}
+      style={[SharedStyles.card, styles.historyCard]}
       onPress={() => {
         router.push({
           pathname: '/results',
@@ -119,10 +121,10 @@ export default function HistoryScreen() {
   );
 
   return (
-    <ThemedView style={styles.container}>
+    <AppLayout useScrollView={false}>
       <View style={styles.header}>
-        <Text style={styles.title}>Analysis History</Text>
-        <Text style={styles.subtitle}>
+        <Text style={SharedStyles.title}>Analysis History</Text>
+        <Text style={SharedStyles.subtitle}>
           Review your past wound analyses and track healing progress
         </Text>
       </View>
@@ -143,41 +145,19 @@ export default function HistoryScreen() {
           </View>
         }
       />
-    </ThemedView>
+    </AppLayout>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
   header: {
-    padding: 20,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#1849D7',
-    marginBottom: 8,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: '#666',
-    lineHeight: 24,
+    marginBottom: 16,
   },
   list: {
     padding: 20,
   },
   historyCard: {
-    backgroundColor: 'white',
-    borderRadius: 20,
-    padding: 16,
     marginBottom: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 3,
   },
   cardHeader: {
     flexDirection: 'row',
@@ -195,11 +175,11 @@ const styles = StyleSheet.create({
   classification: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#1849D7',
+    color: Colors.light.primary,
   },
   timestamp: {
     fontSize: 14,
-    color: '#666',
+    color: Colors.light.gray[500],
   },
   urgencyContainer: {
     flexDirection: 'row',
@@ -219,7 +199,7 @@ const styles = StyleSheet.create({
   },
   hospitalIndicator: {
     fontSize: 12,
-    color: '#FF4444',
+    color: Colors.light.danger,
   },
   emptyState: {
     padding: 20,
@@ -227,7 +207,7 @@ const styles = StyleSheet.create({
   },
   emptyStateText: {
     fontSize: 16,
-    color: '#666',
+    color: Colors.light.gray[500],
     textAlign: 'center',
   },
 }); 

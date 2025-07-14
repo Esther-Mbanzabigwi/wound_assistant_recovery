@@ -1,17 +1,19 @@
 import { useState } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
-import { ThemedView } from '../../components/ThemedView';
+import { StyleSheet, Text, View } from 'react-native';
+import AppLayout from '../../components/AppLayout';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
+import { Colors } from '../../constants/Colors';
+import { SharedStyles } from '../../constants/SharedStyles';
 
 export default function HospitalsScreen() {
   const [searchQuery, setSearchQuery] = useState('');
 
   return (
-    <ThemedView style={styles.container}>
+    <AppLayout>
       <View style={styles.header}>
-        <Text style={styles.title}>Find Nearby Hospitals</Text>
-        <Text style={styles.subtitle}>
+        <Text style={SharedStyles.title}>Find Nearby Hospitals</Text>
+        <Text style={SharedStyles.subtitle}>
           Locate medical facilities near you for immediate care
         </Text>
       </View>
@@ -37,8 +39,8 @@ export default function HospitalsScreen() {
         <Text style={styles.address}>Downtown Area, Main Street</Text>
       </View>
 
-      <ScrollView style={styles.hospitalList}>
-        <View style={styles.hospitalCard}>
+      <View style={styles.hospitalList}>
+        <View style={[SharedStyles.card, styles.hospitalCard]}>
           <View style={styles.hospitalInfo}>
             <Text style={styles.hospitalName}>City General Hospital</Text>
             <Text style={styles.distance}>0.8 miles away</Text>
@@ -72,7 +74,7 @@ export default function HospitalsScreen() {
           </View>
         </View>
 
-        <View style={styles.hospitalCard}>
+        <View style={[SharedStyles.card, styles.hospitalCard]}>
           <View style={styles.hospitalInfo}>
             <Text style={styles.hospitalName}>Women's Health Center</Text>
             <Text style={styles.distance}>1.2 miles away</Text>
@@ -105,29 +107,14 @@ export default function HospitalsScreen() {
             />
           </View>
         </View>
-      </ScrollView>
-    </ThemedView>
+      </View>
+    </AppLayout>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-  },
   header: {
     marginBottom: 24,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#1849D7',
-    marginBottom: 8,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: '#666',
-    lineHeight: 24,
   },
   searchContainer: {
     flexDirection: 'row',
@@ -141,34 +128,26 @@ const styles = StyleSheet.create({
     minWidth: 140,
   },
   locationInfo: {
-    backgroundColor: '#F5F7FF',
+    backgroundColor: Colors.light.blue[50],
     padding: 12,
     borderRadius: 8,
     marginBottom: 24,
   },
   locationText: {
     fontSize: 14,
-    color: '#666',
+    color: Colors.light.gray[500],
     marginBottom: 4,
   },
   address: {
     fontSize: 16,
-    color: '#333',
+    color: Colors.light.text,
     fontWeight: '500',
   },
   hospitalList: {
     flex: 1,
   },
   hospitalCard: {
-    backgroundColor: '#fff',
-    borderRadius: 16,
-    padding: 16,
     marginBottom: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
   },
   hospitalInfo: {
     flexDirection: 'row',
@@ -179,30 +158,30 @@ const styles = StyleSheet.create({
   hospitalName: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#1849D7',
+    color: Colors.light.primary,
   },
   distance: {
     fontSize: 14,
-    color: '#666',
+    color: Colors.light.gray[500],
   },
   hospitalAddress: {
     fontSize: 16,
-    color: '#333',
+    color: Colors.light.text,
     marginBottom: 4,
   },
   phone: {
     fontSize: 16,
-    color: '#333',
+    color: Colors.light.text,
     marginBottom: 4,
   },
   hours: {
     fontSize: 14,
-    color: '#666',
+    color: Colors.light.gray[500],
     marginBottom: 8,
   },
   waitTime: {
     fontSize: 14,
-    color: '#666',
+    color: Colors.light.gray[500],
     marginBottom: 12,
   },
   specialties: {
@@ -212,12 +191,12 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   specialtyTag: {
-    backgroundColor: '#E8EFFF',
+    backgroundColor: Colors.light.blue[50],
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 16,
     fontSize: 14,
-    color: '#1849D7',
+    color: Colors.light.primary,
   },
   actions: {
     flexDirection: 'row',
