@@ -1,62 +1,45 @@
-import * as ImagePicker from 'expo-image-picker';
-import { useRouter } from 'expo-router';
-import { useEffect, useState } from 'react';
-import { ActivityIndicator, Alert, Image, StyleSheet, Text, View } from 'react-native';
-import api from '../../api';
-import AppLayout from '../../components/AppLayout';
-import Button from '../../components/ui/Button';
-import { Colors } from '../../constants/Colors';
+import * as ImagePicker from "expo-image-picker";
+import { useEffect, useState } from "react";
+import {
+  ActivityIndicator,
+  Alert,
+  Image,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
+import api from "../../api";
+import AppLayout from "../../components/AppLayout";
+import Button from "../../components/ui/Button";
+import { Colors } from "../../constants/Colors";
 
 export default function CaptureScreen() {
-  const [image, setImage] = useState<string | null>(null);
+  const [image, setImage] = useState<ImagePicker.ImagePickerAsset | null>(null);
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
 
   useEffect(() => {
     (async () => {
       const { status } = await ImagePicker.requestCameraPermissionsAsync();
-      if (status !== 'granted') {
-        Alert.alert('Permission needed', 'Camera permission is required to take photos.');
+      if (status !== "granted") {
+        Alert.alert(
+          "Permission needed",
+          "Camera permission is required to take photos."
+        );
       }
     })();
   }, []);
 
-  const analyzeWound = async (imageUri: string) => {
+  const analyzeWound = async () => {
     try {
       setLoading(true);
-      
-      // Check if model server is available
-      const isHealthy = await api.checkModelHealth();
-      if (!isHealthy) {
-        throw new Error('Model server is not available');
-      }
-
-      // Classify wound
-      const prediction = await api.classifyWound(imageUri);
-      
-      // Save prediction to Strapi
-      await api.predictions.save({
-        imageUrl: imageUri,
-        classification: prediction.predicted_class,
-        confidence: prediction.confidence,
-        urgencyLevel: prediction.urgency_level,
-        requiresHospital: prediction.requires_hospital,
-        recommendations: prediction.recommendations,
-        timestamp: new Date().toISOString(),
-      });
-
-      // Navigate to results
-      router.push({
-        pathname: '/results',
-        params: {
-          prediction: JSON.stringify(prediction),
-          imageUri,
-        },
-      });
+      const prediction = await api.classifyWound(image!);
+      console.log("prediction ================== =");
+      console.log(prediction);
     } catch (error) {
+      console.log(error);
       Alert.alert(
-        'Error',
-        'Failed to analyze wound. Please check your internet connection and try again.'
+        "Error",
+        "Failed to analyze wound. Please check your internet connection and try again."
       );
     } finally {
       setLoading(false);
@@ -73,11 +56,12 @@ export default function CaptureScreen() {
       });
 
       if (!result.canceled) {
-        setImage(result.assets[0].uri);
-        analyzeWound(result.assets[0].uri);
+        setImage(result.assets[0]);
+        analyzeWound();
       }
     } catch (error) {
-      Alert.alert('Error', 'Failed to take photo. Please try again.');
+      console.log(error);
+      Alert.alert("Error", "Failed to take photo. Please try again.");
     }
   };
 
@@ -91,11 +75,12 @@ export default function CaptureScreen() {
       });
 
       if (!result.canceled) {
-        setImage(result.assets[0].uri);
-        analyzeWound(result.assets[0].uri);
+        setImage(result.assets[0]);
+        analyzeWound();
       }
     } catch (error) {
-      Alert.alert('Error', 'Failed to pick image. Please try again.');
+      console.log(error);
+      Alert.alert("Error", "Failed to pick image. Please try again.");
     }
   };
 
@@ -104,7 +89,7 @@ export default function CaptureScreen() {
       <View style={styles.captureArea}>
         {image ? (
           <View style={styles.imagePreview}>
-            <Image source={{ uri: image }} style={styles.previewImage} />
+            <Image source={{ uri: image.uri }} style={styles.previewImage} />
           </View>
         ) : (
           <View style={styles.cameraPlaceholder}>
@@ -143,16 +128,16 @@ export default function CaptureScreen() {
 const styles = StyleSheet.create({
   captureArea: {
     flex: 1,
-    justifyContent: 'center',
+    justifyContent: "center",
     gap: 32,
   },
   cameraPlaceholder: {
     backgroundColor: Colors.light.card,
     borderRadius: 20,
     padding: 40,
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: '#000',
+    alignItems: "center",
+    justifyContent: "center",
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
@@ -165,41 +150,41 @@ const styles = StyleSheet.create({
   captureText: {
     fontSize: 18,
     color: Colors.light.primary,
-    fontWeight: '600',
-    textAlign: 'center',
+    fontWeight: "600",
+    textAlign: "center",
   },
   imagePreview: {
     backgroundColor: Colors.light.card,
     borderRadius: 20,
-    overflow: 'hidden',
-    aspectRatio: 4/3,
-    shadowColor: '#000',
+    overflow: "hidden",
+    aspectRatio: 4 / 3,
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
     elevation: 3,
   },
   previewImage: {
-    width: '100%',
-    height: '100%',
+    width: "100%",
+    height: "100%",
   },
   actions: {
     gap: 16,
-    alignItems: 'center',
+    alignItems: "center",
   },
   button: {
-    width: '100%',
+    width: "100%",
   },
   orText: {
     color: Colors.light.gray[500],
     fontSize: 16,
   },
   loading: {
-    alignItems: 'center',
+    alignItems: "center",
     gap: 16,
   },
   loadingText: {
     fontSize: 16,
     color: Colors.light.gray[500],
   },
-}); 
+});
