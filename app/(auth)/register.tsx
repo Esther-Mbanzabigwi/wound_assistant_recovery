@@ -4,12 +4,11 @@ import { useState } from "react";
 import {
     Alert,
     Image,
-    ImageBackground,
     ScrollView,
     StyleSheet,
     Text,
     TouchableOpacity,
-    View,
+    View
 } from "react-native";
 import Button from "../../components/ui/Button";
 import Input from "../../components/ui/Input";
@@ -26,6 +25,7 @@ export default function RegisterScreen() {
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const { register } = useAuthContext();
+  
   // Form validation function
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
@@ -97,9 +97,6 @@ export default function RegisterScreen() {
         ]
       );
     } catch (error: any) {
-      console.error("Registration error:", error);
-
-      // Handle specific error cases
       let errorMessage = "Registration failed. Please try again.";
 
       if (error.response?.data?.error?.message) {
@@ -122,160 +119,159 @@ export default function RegisterScreen() {
   };
 
   return (
-    <ImageBackground
-      source={require("../../assets/images/mother.png")}
-      resizeMode="cover"
-      style={styles.backgroundImage}
-    >
-      <View style={styles.overlay}>
-        <ScrollView
-          style={SharedStyles.container}
-          contentContainerStyle={styles.scrollContent}
-          showsVerticalScrollIndicator={false}
-        >
-          <TouchableOpacity>
-            <Link href="/" style={styles.backLink}>
-              <Text style={styles.backText}>← Back to Home</Text>
-            </Link>
-          </TouchableOpacity>
+    <View style={styles.container}>
+      <ScrollView
+        style={styles.scrollContent}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        <TouchableOpacity>
+          <Link href="/" style={styles.backLink}>
+            <Text style={styles.backText}>← Back to Home</Text>
+          </Link>
+        </TouchableOpacity>
 
-          <View style={[SharedStyles.card, styles.authCard]}>
-            <View style={styles.logo}>
-              <View style={styles.iconContainer}>
-                <Image
-                  source={require("../../assets/images/baby_hand.png")}
-                  style={styles.iconImage}
-                  resizeMode="cover"
-                />
-              </View>
-              <Text style={[SharedStyles.title, styles.welcomeText]}>Join WoundTrack</Text>
-              <Text style={SharedStyles.subtitle}>
-                Create your account to start monitoring your recovery
-              </Text>
+        <View
+          style={[
+            SharedStyles.card,
+            styles.authCard,
+          ]}
+        >
+          <View style={styles.logo}>
+            <View style={styles.iconContainer}>
+              <Image
+                source={require("../../assets/images/baby_hand.png")}
+                style={styles.iconImage}
+                resizeMode="cover"
+              />
+            </View>
+            <Text style={[SharedStyles.title, styles.welcomeText]}>Join WoundTrack</Text>
+            <Text style={SharedStyles.subtitle}>
+              Create your account to start monitoring your recovery
+            </Text>
+          </View>
+          
+          <View style={styles.form}>
+            <View style={SharedStyles.formGroup}>
+              <Text style={SharedStyles.label}>Full Name</Text>
+              <Input
+                placeholder="Your full name"
+                value={fullName}
+                onChangeText={(text) => {
+                  setFullName(text);
+                  clearError("fullName");
+                }}
+                icon="user"
+                error={errors.fullName}
+              />
+              {errors.fullName && (
+                <Text style={SharedStyles.errorText}>{errors.fullName}</Text>
+              )}
             </View>
 
-            <View style={styles.form}>
-              <View style={SharedStyles.formGroup}>
-                <Text style={SharedStyles.label}>Full Name</Text>
-                <Input
-                  placeholder="Your full name"
-                  value={fullName}
-                  onChangeText={(text) => {
-                    setFullName(text);
-                    clearError("fullName");
-                  }}
-                  icon="user"
-                  error={errors.fullName}
-                />
-                {errors.fullName && (
-                  <Text style={SharedStyles.errorText}>{errors.fullName}</Text>
-                )}
-              </View>
-
-              <View style={SharedStyles.formGroup}>
-                <Text style={SharedStyles.label}>Email</Text>
-                <Input
-                  placeholder="your.email@example.com"
-                  value={email}
-                  onChangeText={(text) => {
-                    setEmail(text);
-                    clearError("email");
-                  }}
-                  keyboardType="email-address"
-                  autoCapitalize="none"
-                  icon="mail"
-                  error={errors.email}
-                />
-                {errors.email && (
-                  <Text style={SharedStyles.errorText}>{errors.email}</Text>
-                )}
-              </View>
-
-              <View style={SharedStyles.formGroup}>
-                <Text style={SharedStyles.label}>Phone Number</Text>
-                <Input
-                  placeholder="+ (250) 000-000-000"
-                  value={phoneNumber}
-                  onChangeText={(text) => {
-                    setPhoneNumber(text);
-                    clearError("phoneNumber");
-                  }}
-                  keyboardType="phone-pad"
-                  icon="phone"
-                  error={errors.phoneNumber}
-                />
-                {errors.phoneNumber && (
-                  <Text style={SharedStyles.errorText}>{errors.phoneNumber}</Text>
-                )}
-              </View>
-
-              <View style={SharedStyles.formGroup}>
-                <Text style={SharedStyles.label}>Password</Text>
-                <Input
-                  placeholder="••••••••"
-                  value={password}
-                  onChangeText={(text) => {
-                    setPassword(text);
-                    clearError("password");
-                  }}
-                  secureTextEntry
-                  icon="lock"
-                  error={errors.password}
-                />
-                {errors.password && (
-                  <Text style={SharedStyles.errorText}>{errors.password}</Text>
-                )}
-              </View>
-
-              <View style={SharedStyles.formGroup}>
-                <Text style={SharedStyles.label}>Confirm Password</Text>
-                <Input
-                  placeholder="••••••••"
-                  value={confirmPassword}
-                  onChangeText={(text) => {
-                    setConfirmPassword(text);
-                    clearError("confirmPassword");
-                  }}
-                  secureTextEntry
-                  icon="lock"
-                  error={errors.confirmPassword}
-                />
-                {errors.confirmPassword && (
-                  <Text style={SharedStyles.errorText}>{errors.confirmPassword}</Text>
-                )}
-              </View>
-
-              <Button
-                variant="primary"
-                onPress={handleRegister}
-                style={styles.button}
-                title={isLoading ? "Creating Account..." : "Create Account"}
-                disabled={isLoading}
+            <View style={SharedStyles.formGroup}>
+              <Text style={SharedStyles.label}>Email</Text>
+              <Input
+                placeholder="your.email@example.com"
+                value={email}
+                onChangeText={(text) => {
+                  setEmail(text);
+                  clearError("email");
+                }}
+                keyboardType="email-address"
+                autoCapitalize="none"
+                autoCorrect={false}
+                icon="mail"
+                error={errors.email}
               />
+              {errors.email && (
+                <Text style={SharedStyles.errorText}>{errors.email}</Text>
+              )}
+            </View>
 
-              <View style={styles.footer}>
-                <Text style={styles.footerText}>Already have an account? </Text>
-                <Link href="/(auth)/login">
-                  <Text style={styles.footerLink}>Sign in here</Text>
-                </Link>
-              </View>
+            <View style={SharedStyles.formGroup}>
+              <Text style={SharedStyles.label}>Phone Number</Text>
+              <Input
+                placeholder="+ (250) 000-000-000"
+                value={phoneNumber}
+                onChangeText={(text) => {
+                  setPhoneNumber(text);
+                  clearError("phoneNumber");
+                }}
+                keyboardType="phone-pad"
+                icon="phone"
+                error={errors.phoneNumber}
+              />
+              {errors.phoneNumber && (
+                <Text style={SharedStyles.errorText}>{errors.phoneNumber}</Text>
+              )}
+            </View>
+
+            <View style={SharedStyles.formGroup}>
+              <Text style={SharedStyles.label}>Password</Text>
+              <Input
+                placeholder="••••••••"
+                value={password}
+                onChangeText={(text) => {
+                  setPassword(text);
+                  clearError("password");
+                }}
+                secureTextEntry
+                autoCapitalize="none"
+                autoCorrect={false}
+                icon="lock"
+                error={errors.password}
+              />
+              {errors.password && (
+                <Text style={SharedStyles.errorText}>{errors.password}</Text>
+              )}
+            </View>
+
+            <View style={SharedStyles.formGroup}>
+              <Text style={SharedStyles.label}>Confirm Password</Text>
+              <Input
+                placeholder="••••••••"
+                value={confirmPassword}
+                onChangeText={(text) => {
+                  setConfirmPassword(text);
+                  clearError("confirmPassword");
+                }}
+                secureTextEntry
+                autoCapitalize="none"
+                autoCorrect={false}
+                icon="lock"
+                error={errors.confirmPassword}
+              />
+              {errors.confirmPassword && (
+                <Text style={SharedStyles.errorText}>{errors.confirmPassword}</Text>
+              )}
+            </View>
+
+            <Button
+              variant="primary"
+              onPress={handleRegister}
+              style={styles.button}
+              title={isLoading ? "Creating Account..." : "Create Account"}
+              disabled={isLoading}
+            />
+
+            <View style={styles.footer}>
+              <Text style={styles.footerText}>Already have an account? </Text>
+              <Link href="/(auth)/login">
+                <Text style={styles.footerLink}>Sign in here</Text>
+              </Link>
             </View>
           </View>
-        </ScrollView>
-      </View>
-    </ImageBackground>
+        </View>
+      </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  backgroundImage: {
+  container: {
     flex: 1,
-    width: "100%",
-    height: "100%",
-  },
-  overlay: {
-    flex: 1,
-    backgroundColor: "rgba(255, 255, 255, 0.15)",
+    backgroundColor: Colors.light.background,
   },
   scrollContent: {
     padding: 20,
@@ -287,17 +283,21 @@ const styles = StyleSheet.create({
     padding: 8,
   },
   backText: {
-    color: "#fff",
+    color: Colors.light.primary,
     fontSize: 18,
-    textShadowColor: "rgba(0, 0, 0, 0.3)",
-    textShadowOffset: { width: 1, height: 1 },
-    textShadowRadius: 2,
+    fontWeight: "500",
   },
   authCard: {
-    backgroundColor: "rgba(255, 255, 255, 0.95)",
+    backgroundColor: Colors.light.card,
     padding: 28,
-    borderColor: "rgba(255, 255, 255, 0.5)",
+    borderColor: Colors.light.border,
     borderWidth: 1,
+    borderRadius: 24,
+    shadowColor: Colors.light.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    elevation: 5,
   },
   logo: {
     alignItems: "center",
@@ -307,29 +307,27 @@ const styles = StyleSheet.create({
     width: 90,
     height: 90,
     borderRadius: 45,
-    backgroundColor: "rgba(255, 241, 237, 0.95)",
+    backgroundColor: Colors.light.blue[500],
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 20,
-    shadowColor: "#000",
+    shadowColor: Colors.light.primary,
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.15,
     shadowRadius: 6,
     elevation: 3,
     overflow: "hidden",
-    borderColor: "rgba(255, 255, 255, 0.8)",
+    borderColor: Colors.light.blue[400],
     borderWidth: 2,
   },
   iconImage: {
-    width: "100%",
-    height: "100%",
-    opacity: 0.9,
+    width: "80%",
+    height: "80%",
+    opacity: 1,
   },
   welcomeText: {
     color: Colors.light.primary,
-    textShadowColor: "rgba(255, 255, 255, 0.8)",
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 2,
+    marginBottom: 8,
   },
   form: {
     gap: 24,

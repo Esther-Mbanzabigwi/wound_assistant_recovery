@@ -1,12 +1,9 @@
 import { useAuthContext } from "@/context/authcontext";
-import { useFocusEffect } from "@react-navigation/native";
 import { Link, router } from "expo-router";
-import React, { useState } from "react";
+import { useState } from "react";
 import {
     Alert,
-    Animated,
     Image,
-    ImageBackground,
     ScrollView,
     StyleSheet,
     Text,
@@ -24,32 +21,7 @@ export default function LoginScreen() {
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const fadeAnim = React.useRef(new Animated.Value(0)).current;
-  const slideAnim = React.useRef(new Animated.Value(50)).current;
-
   const { login } = useAuthContext();
-
-  useFocusEffect(
-    React.useCallback(() => {
-      Animated.parallel([
-        Animated.timing(fadeAnim, {
-          toValue: 1,
-          duration: 1000,
-          useNativeDriver: true,
-        }),
-        Animated.timing(slideAnim, {
-          toValue: 0,
-          duration: 800,
-          useNativeDriver: true,
-        }),
-      ]).start();
-
-      return () => {
-        fadeAnim.setValue(0);
-        slideAnim.setValue(50);
-      };
-    }, [fadeAnim, slideAnim])
-  );
 
   // Form validation function
   const validateForm = (): boolean => {
@@ -111,47 +83,38 @@ export default function LoginScreen() {
     }
   };
 
-  return (
-    <ImageBackground
-      source={require("../../assets/images/mother.png")}
-      resizeMode="cover"
-      style={styles.backgroundImage}
-    >
-      <View style={styles.overlay}>
-        <ScrollView
-          style={SharedStyles.container}
-          contentContainerStyle={styles.scrollContent}
-          showsVerticalScrollIndicator={false}
-        >
-          <TouchableOpacity>
-            <Link href="/" style={styles.backLink}>
-              <Text style={styles.backText}>← Back to Home</Text>
-            </Link>
-          </TouchableOpacity>
+    return (
+    <View style={styles.container}>
+      <ScrollView
+        style={SharedStyles.container}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        <TouchableOpacity>
+          <Link href="/" style={styles.backLink}>
+            <Text style={styles.backText}>← Back to Home</Text>
+          </Link>
+        </TouchableOpacity>
 
-          <Animated.View
-            style={[
-              SharedStyles.card,
-              styles.authCard,
-              {
-                opacity: fadeAnim,
-                transform: [{ translateY: slideAnim }],
-              },
-            ]}
-          >
-            <View style={styles.logo}>
-              <View style={styles.iconContainer}>
-                <Image
-                  source={require("../../assets/images/baby_hand.png")}
-                  style={styles.iconImage}
-                  resizeMode="cover"
-                />
-              </View>
-              <Text style={[SharedStyles.title, styles.welcomeText]}>Welcome Back</Text>
-              <Text style={SharedStyles.subtitle}>
-                Continue your recovery journey
-              </Text>
+        <View
+          style={[
+            SharedStyles.card,
+            styles.authCard,
+          ]}
+        >
+          <View style={styles.logo}>
+            <View style={styles.iconContainer}>
+              <Image
+                source={require("../../assets/images/baby_hand.png")}
+                style={styles.iconImage}
+                resizeMode="cover"
+              />
             </View>
+            <Text style={[SharedStyles.title, styles.welcomeText]}>Welcome Back</Text>
+            <Text style={SharedStyles.subtitle}>
+              Continue your recovery journey
+            </Text>
+          </View>
 
             <View style={styles.form}>
               <View style={SharedStyles.formGroup}>
@@ -212,23 +175,17 @@ export default function LoginScreen() {
                   <Text style={styles.footerLink}>Sign up here</Text>
                 </Link>
               </View>
-            </View>
-          </Animated.View>
+                        </View>
+          </View>
         </ScrollView>
       </View>
-    </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
-  backgroundImage: {
+  container: {
     flex: 1,
-    width: "100%",
-    height: "100%",
-  },
-  overlay: {
-    flex: 1,
-    backgroundColor: "rgba(255, 255, 255, 0.15)",
+    backgroundColor: Colors.light.background,
   },
   scrollContent: {
     padding: 20,
@@ -240,17 +197,21 @@ const styles = StyleSheet.create({
     padding: 8,
   },
   backText: {
-    color: "#fff",
+    color: Colors.light.primary,
     fontSize: 18,
-    textShadowColor: "rgba(0, 0, 0, 0.3)",
-    textShadowOffset: { width: 1, height: 1 },
-    textShadowRadius: 2,
+    fontWeight: "500",
   },
   authCard: {
-    backgroundColor: "rgba(255, 255, 255, 0.95)",
+    backgroundColor: Colors.light.card,
     padding: 28,
-    borderColor: "rgba(255, 255, 255, 0.5)",
+    borderColor: Colors.light.border,
     borderWidth: 1,
+    borderRadius: 24,
+    shadowColor: Colors.light.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    elevation: 5,
   },
   logo: {
     alignItems: "center",
@@ -260,29 +221,27 @@ const styles = StyleSheet.create({
     width: 90,
     height: 90,
     borderRadius: 45,
-    backgroundColor: "rgba(255, 241, 237, 0.95)",
+    backgroundColor: Colors.light.blue[500],
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 20,
-    shadowColor: "#000",
+    shadowColor: Colors.light.primary,
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.15,
     shadowRadius: 6,
     elevation: 3,
     overflow: "hidden",
-    borderColor: "rgba(255, 255, 255, 0.8)",
+    borderColor: Colors.light.blue[400],
     borderWidth: 2,
   },
   iconImage: {
-    width: "100%",
-    height: "100%",
-    opacity: 0.9,
+    width: "80%",
+    height: "80%",
+    opacity: 1,
   },
   welcomeText: {
     color: Colors.light.primary,
-    textShadowColor: "rgba(255, 255, 255, 0.8)",
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 2,
+    marginBottom: 8,
   },
   form: {
     gap: 24,

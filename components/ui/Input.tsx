@@ -72,6 +72,8 @@ const Input: React.FC<InputProps> = ({
   );
 };
 
+export default React.memo(Input);
+
 const styles = StyleSheet.create({
   inputWrapper: {
     flexDirection: "row",
@@ -97,5 +99,3 @@ const styles = StyleSheet.create({
     minHeight: 24,
   },
 });
-
-export default Input;
