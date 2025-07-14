@@ -1,10 +1,8 @@
 import { useAuthContext } from "@/context/authcontext";
-import { useFocusEffect } from "@react-navigation/native";
 import { Link, router } from "expo-router";
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   Alert,
-  Animated,
   Image,
   ImageBackground,
   ScrollView,
@@ -25,33 +23,7 @@ export default function RegisterScreen() {
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const fadeAnim = React.useRef(new Animated.Value(0)).current;
-  const slideAnim = React.useRef(new Animated.Value(50)).current;
-
   const { register } = useAuthContext();
-
-  useFocusEffect(
-    React.useCallback(() => {
-      Animated.parallel([
-        Animated.timing(fadeAnim, {
-          toValue: 1,
-          duration: 1000,
-          useNativeDriver: true,
-        }),
-        Animated.timing(slideAnim, {
-          toValue: 0,
-          duration: 800,
-          useNativeDriver: true,
-        }),
-      ]).start();
-
-      return () => {
-        fadeAnim.setValue(0);
-        slideAnim.setValue(50);
-      };
-    }, [fadeAnim, slideAnim])
-  );
-
   // Form validation function
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
@@ -165,15 +137,7 @@ export default function RegisterScreen() {
             </Link>
           </TouchableOpacity>
 
-          <Animated.View
-            style={[
-              styles.card,
-              {
-                opacity: fadeAnim,
-                transform: [{ translateY: slideAnim }],
-              },
-            ]}
-          >
+          <View style={[styles.card]}>
             <View style={styles.logo}>
               <View style={styles.iconContainer}>
                 <Image
@@ -294,7 +258,7 @@ export default function RegisterScreen() {
                 </Link>
               </View>
             </View>
-          </Animated.View>
+          </View>
         </ScrollView>
       </View>
     </ImageBackground>
