@@ -1,114 +1,225 @@
-import { useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import AppLayout from '../../components/AppLayout';
-import Button from '../../components/ui/Button';
-import Input from '../../components/ui/Input';
-import { Colors } from '../../constants/Colors';
-import { SharedStyles } from '../../constants/SharedStyles';
+import { Ionicons } from "@expo/vector-icons";
+import {
+  BottomSheetModal,
+  BottomSheetModalProvider,
+} from "@gorhom/bottom-sheet";
+import * as Linking from "expo-linking";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { ActivityIndicator, Alert, StyleSheet, Text, View } from "react-native";
+import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
+import { HospitalAPI } from "../../api/hospitalApi";
+import AppLayout from "../../components/AppLayout";
+import HospitalBottomSheet from "../../components/HospitalBottomSheet";
+import Button from "../../components/ui/Button";
+import Input from "../../components/ui/Input";
+import { Colors } from "../../constants/Colors";
+import { SharedStyles } from "../../constants/SharedStyles";
+import { Hospital, Location } from "../../types/hospitalType";
 
 export default function HospitalsScreen() {
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
+  const [hospitals, setHospitals] = useState<Hospital[]>([]);
+  const [userLocation, setUserLocation] = useState<Location | null>(null);
+  const [selectedHospital, setSelectedHospital] = useState<Hospital | null>(
+    null
+  );
+  const [locationLoading, setLocationLoading] = useState(false);
+  const bottomSheetRef = useRef<BottomSheetModal>(null);
+
+  // Get user's current location
+  const getCurrentLocation = useCallback(async () => {
+    try {
+      setLocationLoading(true);
+      const location = await HospitalAPI.getCurrentLocation();
+      setUserLocation(location);
+
+      // Fetch nearby hospitals
+      const nearbyHospitals = await HospitalAPI.getNearbyHospitals(location);
+      setHospitals(nearbyHospitals);
+    } catch (error) {
+      console.error("Error getting location:", error);
+      Alert.alert(
+        "Location Error",
+        "Unable to get your location. Please check your location permissions and try again."
+      );
+    } finally {
+      setLocationLoading(false);
+    }
+  }, []);
+
+  // Search hospitals
+  const searchHospitals = useCallback(async () => {
+    if (!userLocation || !searchQuery.trim()) return;
+
+    try {
+      const searchResults = await HospitalAPI.searchHospitals(
+        searchQuery,
+        userLocation
+      );
+      setHospitals(searchResults);
+    } catch (error) {
+      console.error("Error searching hospitals:", error);
+      Alert.alert(
+        "Search Error",
+        "Unable to search hospitals. Please try again."
+      );
+    }
+  }, [searchQuery, userLocation]);
+
+  // Handle marker press
+  const handleMarkerPress = useCallback((hospital: Hospital) => {
+    setSelectedHospital(hospital);
+    bottomSheetRef.current?.present();
+  }, []);
+
+  // Handle get directions
+  const handleGetDirections = useCallback(async (hospital: Hospital) => {
+    try {
+      const url = `https://www.google.com/maps/dir/?api=1&destination=${hospital.coordinates.latitude},${hospital.coordinates.longitude}`;
+      const supported = await Linking.canOpenURL(url);
+
+      if (supported) {
+        await Linking.openURL(url);
+      } else {
+        Alert.alert("Error", "Unable to open maps application");
+      }
+    } catch (error) {
+      console.error("Error opening directions:", error);
+      Alert.alert("Error", "Unable to open directions");
+    }
+  }, []);
+
+  // Handle call hospital
+  const handleCallHospital = useCallback(async (phone: string) => {
+    try {
+      const url = `tel:${phone}`;
+      const supported = await Linking.canOpenURL(url);
+
+      if (supported) {
+        await Linking.openURL(url);
+      } else {
+        Alert.alert("Error", "Unable to make phone call");
+      }
+    } catch (error) {
+      console.error("Error calling hospital:", error);
+      Alert.alert("Error", "Unable to make phone call");
+    }
+  }, []);
+
+  // Initialize location on component mount
+  useEffect(() => {
+    getCurrentLocation();
+  }, [getCurrentLocation]);
+
+  // // Search when query changes
+  // useEffect(() => {
+  //   if (searchQuery.trim()) {
+  //     const timeoutId = setTimeout(searchHospitals, 500);
+  //     return () => clearTimeout(timeoutId);
+  //   } else if (userLocation) {
+  //     // Reset to nearby hospitals when search is cleared
+  //     HospitalAPI.getNearbyHospitals(userLocation).then(setHospitals);
+  //   }
+  // }, [searchQuery, searchHospitals, userLocation]);
 
   return (
-    <AppLayout>
-      <View style={styles.header}>
-        <Text style={SharedStyles.title}>Find Nearby Hospitals</Text>
-        <Text style={SharedStyles.subtitle}>
-          Locate medical facilities near you for immediate care
-        </Text>
-      </View>
-
-      <View style={styles.searchContainer}>
-        <Input
-          placeholder="Search hospitals"
-          icon="search"
-          style={styles.searchInput}
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-        />
-        <Button
-          title="Use My Location"
-          variant="primary"
-          onPress={() => {}}
-          style={styles.locationButton}
-        />
-      </View>
-
-      <View style={styles.locationInfo}>
-        <Text style={styles.locationText}>Current Location</Text>
-        <Text style={styles.address}>Downtown Area, Main Street</Text>
-      </View>
-
-      <View style={styles.hospitalList}>
-        <View style={[SharedStyles.card, styles.hospitalCard]}>
-          <View style={styles.hospitalInfo}>
-            <Text style={styles.hospitalName}>City General Hospital</Text>
-            <Text style={styles.distance}>0.8 miles away</Text>
-          </View>
-          
-          <Text style={styles.hospitalAddress}>123 Main Street, Downtown</Text>
-          <Text style={styles.phone}>(555) 123-4567</Text>
-          <Text style={styles.hours}>24/7</Text>
-
-          <Text style={styles.waitTime}>Wait Time: ~15 mins</Text>
-
-          <View style={styles.specialties}>
-            <Text style={styles.specialtyTag}>Emergency Care</Text>
-            <Text style={styles.specialtyTag}>Maternity</Text>
-            <Text style={styles.specialtyTag}>Surgery</Text>
-          </View>
-
-          <View style={styles.actions}>
-            <Button
-              title="Get Directions"
-              variant="primary"
-              onPress={() => {}}
-              style={styles.actionButton}
-            />
-            <Button
-              title="Call"
-              variant="secondary"
-              onPress={() => {}}
-              style={styles.actionButton}
-            />
-          </View>
+    <BottomSheetModalProvider>
+      <AppLayout>
+        <View style={styles.header}>
+          <Text style={SharedStyles.title}>Find Nearby Hospitals</Text>
+          <Text style={SharedStyles.subtitle}>
+            Locate medical facilities near you for immediate care
+          </Text>
         </View>
 
-        <View style={[SharedStyles.card, styles.hospitalCard]}>
-          <View style={styles.hospitalInfo}>
-            <Text style={styles.hospitalName}>Women's Health Center</Text>
-            <Text style={styles.distance}>1.2 miles away</Text>
-          </View>
-          
-          <Text style={styles.hospitalAddress}>456 Oak Avenue, Midtown</Text>
-          <Text style={styles.phone}>(555) 987-6543</Text>
-          <Text style={styles.hours}>6 AM - 10 PM</Text>
-
-          <Text style={styles.waitTime}>Wait Time: ~30 mins</Text>
-
-          <View style={styles.specialties}>
-            <Text style={styles.specialtyTag}>Women's Health</Text>
-            <Text style={styles.specialtyTag}>Postpartum Care</Text>
-            <Text style={styles.specialtyTag}>OB/GYN</Text>
-          </View>
-
-          <View style={styles.actions}>
-            <Button
-              title="Get Directions"
-              variant="primary"
-              onPress={() => {}}
-              style={styles.actionButton}
-            />
-            <Button
-              title="Call"
-              variant="secondary"
-              onPress={() => {}}
-              style={styles.actionButton}
-            />
-          </View>
+        <View style={styles.searchContainer}>
+          <Input
+            placeholder="Search hospitals"
+            icon="search"
+            style={styles.searchInput}
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+          />
+          <Button
+            title={locationLoading ? "Loading..." : "Use My Location"}
+            variant="primary"
+            onPress={getCurrentLocation}
+            style={styles.locationButton}
+            disabled={locationLoading}
+          />
         </View>
-      </View>
-    </AppLayout>
+
+        {userLocation && (
+          <View style={styles.locationInfo}>
+            <Text style={styles.locationText}>Current Location</Text>
+            <Text style={styles.address}>{userLocation.address}</Text>
+          </View>
+        )}
+
+        <View style={styles.mapContainer}>
+          {userLocation ? (
+            <MapView
+              provider={PROVIDER_GOOGLE}
+              style={styles.map}
+              initialRegion={{
+                latitude: userLocation.latitude,
+                longitude: userLocation.longitude,
+                latitudeDelta: 0.02,
+                longitudeDelta: 0.02,
+              }}
+              showsUserLocation={true}
+              showsMyLocationButton={true}
+            >
+              {/* User location marker */}
+              <Marker
+                coordinate={{
+                  latitude: userLocation.latitude,
+                  longitude: userLocation.longitude,
+                }}
+                title="Your Location"
+                description="You are here"
+                pinColor={Colors.light.primary}
+              />
+
+              {/* Hospital markers */}
+              {hospitals.map((hospital) => (
+                <Marker
+                  key={hospital.id}
+                  coordinate={{
+                    latitude: hospital.coordinates.latitude,
+                    longitude: hospital.coordinates.longitude,
+                  }}
+                  title={hospital.name}
+                  description={hospital.address}
+                  onPress={() => handleMarkerPress(hospital)}
+                >
+                  <View style={styles.markerContainer}>
+                    <View style={styles.markerIcon}>
+                      <Ionicons name="medical" size={16} color="#fff" />
+                    </View>
+                  </View>
+                </Marker>
+              ))}
+            </MapView>
+          ) : (
+            <View style={styles.mapPlaceholder}>
+              {locationLoading ? (
+                <ActivityIndicator size="large" color={Colors.light.primary} />
+              ) : (
+                <Text style={styles.mapPlaceholderText}>Loading map...</Text>
+              )}
+            </View>
+          )}
+        </View>
+
+        <HospitalBottomSheet
+          ref={bottomSheetRef}
+          hospital={selectedHospital}
+          onGetDirections={handleGetDirections}
+          onCall={handleCallHospital}
+        />
+      </AppLayout>
+    </BottomSheetModalProvider>
   );
 }
 
@@ -117,7 +228,7 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   searchContainer: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 12,
     marginBottom: 16,
   },
@@ -131,7 +242,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.light.blue[50],
     padding: 12,
     borderRadius: 8,
-    marginBottom: 24,
+    marginBottom: 16,
   },
   locationText: {
     fontSize: 14,
@@ -141,68 +252,39 @@ const styles = StyleSheet.create({
   address: {
     fontSize: 16,
     color: Colors.light.text,
-    fontWeight: '500',
+    fontWeight: "500",
   },
-  hospitalList: {
+  mapContainer: {
     flex: 1,
-  },
-  hospitalCard: {
+    borderRadius: 12,
+    overflow: "hidden",
     marginBottom: 16,
   },
-  hospitalInfo: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
+  map: {
+    width: "100%",
+    height: "100%",
   },
-  hospitalName: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: Colors.light.primary,
+  mapPlaceholder: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: Colors.light.gray[100],
   },
-  distance: {
-    fontSize: 14,
-    color: Colors.light.gray[500],
-  },
-  hospitalAddress: {
+  mapPlaceholderText: {
     fontSize: 16,
-    color: Colors.light.text,
-    marginBottom: 4,
-  },
-  phone: {
-    fontSize: 16,
-    color: Colors.light.text,
-    marginBottom: 4,
-  },
-  hours: {
-    fontSize: 14,
     color: Colors.light.gray[500],
-    marginBottom: 8,
   },
-  waitTime: {
-    fontSize: 14,
-    color: Colors.light.gray[500],
-    marginBottom: 12,
+  markerContainer: {
+    alignItems: "center",
   },
-  specialties: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-    marginBottom: 16,
-  },
-  specialtyTag: {
-    backgroundColor: Colors.light.blue[50],
-    paddingHorizontal: 12,
-    paddingVertical: 6,
+  markerIcon: {
+    width: 32,
+    height: 32,
     borderRadius: 16,
-    fontSize: 14,
-    color: Colors.light.primary,
+    backgroundColor: Colors.light.primary,
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 2,
+    borderColor: "#fff",
   },
-  actions: {
-    flexDirection: 'row',
-    gap: 12,
-  },
-  actionButton: {
-    flex: 1,
-  },
-}); 
+});
