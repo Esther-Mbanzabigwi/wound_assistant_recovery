@@ -21,10 +21,7 @@ export const UserHandler = {
   async register(user: IRegisterUser): Promise<ILoginResponse> {
     const image = user.profile ? await this.uploadImage(user.profile) : null;
     console.log(user);
-    const { data } = await strapi.post("/auth/local/register", {
-      ...user,
-      profile: image?.id || null,
-    });
+    const { data } = await strapi.post("/auth/local/register", user);
 
     return data;
   },

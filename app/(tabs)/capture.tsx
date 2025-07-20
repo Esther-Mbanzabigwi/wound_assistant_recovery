@@ -1,3 +1,8 @@
+import api from "@/api";
+import PredictionHandler from "@/api/prediction";
+import { useAuthContext } from "@/context/authcontext";
+import { IImage } from "@/types/imageType";
+import { ICreatePrediction } from "@/types/prediction";
 import * as ImagePicker from "expo-image-picker";
 import { useEffect, useState } from "react";
 import {
@@ -8,7 +13,6 @@ import {
   Text,
   View,
 } from "react-native";
-import api from "../../api";
 import AppLayout from "../../components/AppLayout";
 import Button from "../../components/ui/Button";
 import { Colors } from "../../constants/Colors";
@@ -16,6 +20,8 @@ import { Colors } from "../../constants/Colors";
 export default function CaptureScreen() {
   const [image, setImage] = useState<ImagePicker.ImagePickerAsset | null>(null);
   const [loading, setLoading] = useState(false);
+
+  const { user } = useAuthContext();
 
   useEffect(() => {
     (async () => {
@@ -32,11 +38,22 @@ export default function CaptureScreen() {
   const analyzeWound = async () => {
     try {
       setLoading(true);
-      const prediction = await api.classifyWound(image!);
-      console.log("prediction ================== =");
+      const strapiImage = (await PredictionHandler.uploadImage(
+        image!
+      )) as IImage;
+      const prediction: ICreatePrediction = await api.classifyWound(image!);
       console.log(prediction);
+      const newPrediction = {
+        image: strapiImage.id.toString(),
+        user: user?.documentId.toString() || "",
+        recommendations: JSON.stringify(prediction.recommendations),
+        prediction: prediction.predicted_class!,
+        predictionConfidence: prediction.confidence!,
+      };
+      console.log(newPrediction);
+      await PredictionHandler.createPrediction(newPrediction);
     } catch (error) {
-      console.log(error);
+      console.log(JSON.stringify(error, null, 2));
       Alert.alert(
         "Error",
         "Failed to analyze wound. Please check your internet connection and try again."

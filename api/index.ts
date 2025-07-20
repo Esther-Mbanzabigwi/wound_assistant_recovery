@@ -1,7 +1,9 @@
 import axios from "axios";
+import * as FileSystem from "expo-file-system";
 import { ImagePickerAsset } from "expo-image-picker";
 
 const modelUrl = "https://wound-model-api.onrender.com";
+// const modelUrl = "http://0.0.0.0:8502";
 
 // Types
 export interface WoundPrediction {
@@ -15,21 +17,28 @@ export interface WoundPrediction {
 
 // API Service
 const api = {
-  classifyWound: async (
-    imageUri: ImagePickerAsset
-  ): Promise<WoundPrediction> => {
+  classifyWound: async (image: ImagePickerAsset): Promise<WoundPrediction> => {
     const formData = new FormData();
-    console.log("imageUri ================== =");
-    formData.append("file", imageUri as unknown as Blob);
-    console.log("formData ================== =");
+
+    const fileUri = image.uri;
+    const fileInfo = await FileSystem.getInfoAsync(fileUri);
+
+    if (!fileInfo.exists) {
+      throw new Error("File not found");
+    }
+
+    // Append file to form data
+    formData.append("file", {
+      uri: fileUri,
+      name: "wound.jpg",
+      type: "image/jpeg",
+    } as any);
 
     const response = await axios.post(`${modelUrl}/predict`, formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
     });
-
-    console.log("response ================== =");
 
     return response.data;
   },
