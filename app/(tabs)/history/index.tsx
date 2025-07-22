@@ -19,38 +19,39 @@ export default function HistoryScreen() {
   const loadHistory = async () => {
     try {
       setLoading(true);
-      setDebugInfo('Starting to load history...');
-      console.log('Loading history for user:', user?.documentId);
+      setDebugInfo('🔄 Loading predictions from database...');
       
-      if (user?.documentId) {
-        setDebugInfo(`Fetching predictions for user: ${user.documentId}`);
-        const predictions = await PredictionHandler.getUserPredictions(parseInt(user.documentId));
-        console.log('Fetched predictions:', predictions);
-        setHistory(predictions);
-        setDebugInfo(`Found ${predictions.length} predictions for user`);
-      } else {
-        setDebugInfo('No user ID available, fetching all predictions...');
-        console.log('No user ID available');
-        // Try to fetch all predictions if no user ID (for testing)
-        const allPredictions = await PredictionHandler.getAllPredictions();
-        console.log('Fetched all predictions:', allPredictions);
+      // Always try to fetch all predictions first
+      const allPredictions = await PredictionHandler.getAllPredictions();
+      console.log('Fetched all predictions:', allPredictions);
+      
+      if (allPredictions && allPredictions.length > 0) {
         setHistory(allPredictions);
-        setDebugInfo(`Found ${allPredictions.length} total predictions`);
+        setDebugInfo(`✅ Successfully loaded ${allPredictions.length} predictions`);
+      } else {
+        setDebugInfo('📭 No predictions found in database. Create some test data first!');
+        setHistory([]);
       }
     } catch (error) {
       console.error('Failed to load history:', error);
-      setDebugInfo(`Error: ${error.message}`);
-      // Try to fetch all predictions as fallback
+      setDebugInfo(`❌ Error loading predictions: ${error.message}`);
+      
+      // Try direct fetch as fallback
       try {
-        setDebugInfo('Trying fallback - fetching all predictions...');
-        const allPredictions = await PredictionHandler.getAllPredictions();
-        console.log('Fallback - fetched all predictions:', allPredictions);
-        setHistory(allPredictions);
-        setDebugInfo(`Fallback successful: ${allPredictions.length} predictions`);
+        setDebugInfo('🔄 Trying direct API fetch...');
+        const response = await fetch('https://wound-assitant-backend.onrender.com/api/predictions?populate=*');
+        const data = await response.json();
+        
+        if (data.data && data.data.length > 0) {
+          setHistory(data.data);
+          setDebugInfo(`✅ Direct fetch successful: ${data.data.length} predictions`);
+        } else {
+          setDebugInfo('📭 No predictions found via direct fetch');
+          setHistory([]);
+        }
       } catch (fallbackError) {
-        console.error('Fallback also failed:', fallbackError);
-        setDebugInfo(`Fallback failed: ${fallbackError.message}`);
-        Alert.alert('Error', 'Failed to load predictions. Please check your internet connection.');
+        setDebugInfo(`❌ All methods failed: ${fallbackError.message}`);
+        setHistory([]);
       }
     } finally {
       setLoading(false);
@@ -138,7 +139,7 @@ export default function HistoryScreen() {
 
   const testCreatePrediction = async () => {
     try {
-      setDebugInfo('Testing prediction creation...');
+      setDebugInfo('Creating test prediction...');
       
       const testPrediction = {
         image: "1", // Use a default image ID
@@ -156,6 +157,45 @@ export default function HistoryScreen() {
     } catch (error) {
       setDebugInfo(`Failed to create prediction: ${error.message}`);
       console.error('Test prediction creation error:', error);
+    }
+  };
+
+  const createSamplePredictions = async () => {
+    try {
+      setDebugInfo('Creating sample predictions...');
+      
+      const samplePredictions = [
+        {
+          image: "1",
+          user: "1",
+          prediction: "Healing",
+          predictionConfidence: 0.78,
+          recommendations: "Continue current treatment plan"
+        },
+        {
+          image: "2", 
+          user: "1",
+          prediction: "Infected",
+          predictionConfidence: 0.92,
+          recommendations: "Seek immediate medical attention"
+        },
+        {
+          image: "3",
+          user: "1", 
+          prediction: "Normal",
+          predictionConfidence: 0.95,
+          recommendations: "Wound healing well, maintain hygiene"
+        }
+      ];
+      
+      for (const prediction of samplePredictions) {
+        await PredictionHandler.createPrediction(prediction);
+      }
+      
+      setDebugInfo('Sample predictions created successfully');
+      await loadHistory();
+    } catch (error) {
+      setDebugInfo(`Failed to create samples: ${error.message}`);
     }
   };
 
@@ -193,6 +233,52 @@ export default function HistoryScreen() {
     } catch (error) {
       setDebugInfo(`Minimal test error: ${error.message}`);
       console.error('Minimal test error:', error);
+    }
+  };
+
+  const createRealTestPredictions = async () => {
+    try {
+      setDebugInfo('Creating real test predictions with proper data...');
+      
+      const realTestPredictions = [
+        {
+          image: "1",
+          user: "1",
+          prediction: "Healing",
+          predictionConfidence: 0.78,
+          recommendations: "Continue current treatment plan | Keep wound clean and dry | Monitor for any changes"
+        },
+        {
+          image: "2", 
+          user: "1",
+          prediction: "Infected",
+          predictionConfidence: 0.92,
+          recommendations: "Seek immediate medical attention | Do not apply any creams | Keep area clean"
+        },
+        {
+          image: "3",
+          user: "1", 
+          prediction: "Normal",
+          predictionConfidence: 0.95,
+          recommendations: "Wound healing well | Maintain good hygiene | Continue current care routine"
+        },
+        {
+          image: "4",
+          user: "1",
+          prediction: "Healing",
+          predictionConfidence: 0.87,
+          recommendations: "Slight improvement noted | Continue monitoring | Follow up with healthcare provider"
+        }
+      ];
+      
+      for (const prediction of realTestPredictions) {
+        await PredictionHandler.createPrediction(prediction);
+      }
+      
+      setDebugInfo('Real test predictions created successfully!');
+      await loadHistory();
+    } catch (error) {
+      setDebugInfo(`Failed to create real predictions: ${error.message}`);
     }
   };
 
@@ -253,6 +339,12 @@ export default function HistoryScreen() {
       <TouchableOpacity
         style={[SharedStyles.card, styles.historyCard]}
         onPress={() => {
+          const itemRecommendations = item.recommendations ? 
+            (Array.isArray(item.recommendations) 
+              ? item.recommendations.join('|') 
+              : item.recommendations) : 
+            '';
+          
           router.push({
             pathname: '/history/result',
             params: {
@@ -260,17 +352,15 @@ export default function HistoryScreen() {
               result: item.prediction,
               confidence: item.predictionConfidence.toString(),
               predictionId: item.id,
+              recommendations: itemRecommendations,
             },
           });
         }}
       >
         <View style={styles.cardHeader}>
-          {imageUrl && (
-            <Image
-              source={{ uri: imageUrl }}
-              style={styles.thumbnail}
-            />
-          )}
+          <View style={styles.imagePlaceholder}>
+            <Text style={styles.imagePlaceholderText}>📷</Text>
+          </View>
           <View style={styles.cardInfo}>
             <Text style={styles.classification}>
               {item.prediction || 'Unknown'}
@@ -292,6 +382,15 @@ export default function HistoryScreen() {
                 </Text>
               </View>
             </View>
+            {item.recommendations && (
+              <Text style={styles.recommendationsPreview} numberOfLines={2}>
+                {typeof item.recommendations === 'string' 
+                  ? item.recommendations.split(' | ')[0] // Show first recommendation
+                  : Array.isArray(item.recommendations) 
+                    ? item.recommendations[0] 
+                    : 'View details for recommendations'}
+              </Text>
+            )}
           </View>
         </View>
       </TouchableOpacity>
@@ -321,7 +420,7 @@ export default function HistoryScreen() {
         ListEmptyComponent={
           <View style={styles.emptyState}>
             <Text style={styles.emptyStateText}>
-              {loading ? 'Loading your history...' : 'No wound analyses yet. Take a photo to get started!'}
+              {loading ? '🔄 Loading your history...' : '📭 No wound analyses yet. Create test data or take a photo to get started!'}
             </Text>
             {!loading && (
               <View style={styles.testButtons}>
@@ -361,6 +460,18 @@ export default function HistoryScreen() {
                 >
                   <Text style={styles.testButtonText}>Minimal Prediction</Text>
                 </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.testButton, { backgroundColor: Colors.light.success }]}
+                  onPress={createSamplePredictions}
+                >
+                  <Text style={styles.testButtonText}>Create Samples</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.testButton, { backgroundColor: Colors.light.info }]}
+                  onPress={createRealTestPredictions}
+                >
+                  <Text style={styles.testButtonText}>Create Real Test Predictions</Text>
+                </TouchableOpacity>
               </View>
             )}
           </View>
@@ -392,10 +503,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 16,
   },
-  thumbnail: {
+  imagePlaceholder: {
     width: 80,
     height: 80,
     borderRadius: 12,
+    backgroundColor: Colors.light.gray[200],
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  imagePlaceholderText: {
+    fontSize: 24,
   },
   cardInfo: {
     flex: 1,
@@ -425,6 +542,12 @@ const styles = StyleSheet.create({
     color: 'white',
     fontWeight: '600',
     fontSize: 12,
+  },
+  recommendationsPreview: {
+    fontSize: 12,
+    color: Colors.light.gray[600],
+    marginTop: 4,
+    fontStyle: 'italic',
   },
   emptyState: {
     padding: 20,

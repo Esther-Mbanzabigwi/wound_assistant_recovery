@@ -44,10 +44,15 @@ export default function CaptureScreen() {
       )) as IImage;
       const prediction = await api.classifyWound(image!);
       console.log(prediction);
+      // Format recommendations properly for storage
+      const formattedRecommendations = Array.isArray(prediction.recommendations) 
+        ? prediction.recommendations.join(' | ')
+        : prediction.recommendations || 'Continue monitoring your wound and follow healthcare provider advice.';
+      
       const newPrediction: ICreatePrediction = {
         image: strapiImage.id.toString(),
         user: user?.documentId?.toString() || "1", // Default to user 1 if no user ID
-        recommendations: prediction.recommendations as any,
+        recommendations: formattedRecommendations,
         prediction: prediction.predicted_class!,
         predictionConfidence: prediction.confidence!,
       };

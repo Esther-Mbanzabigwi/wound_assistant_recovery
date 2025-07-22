@@ -10,6 +10,8 @@ export interface Hospital {
     latitude: number;
     longitude: number;
   };
+  website?: string;
+  rating?: number;
   distance?: number;
 }
 

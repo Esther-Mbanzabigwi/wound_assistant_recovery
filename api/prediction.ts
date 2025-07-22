@@ -17,9 +17,7 @@ export const PredictionHandler = {
         user: predictionData.user,
         prediction: predictionData.prediction,
         predictionConfidence: parseFloat(predictionData.predictionConfidence.toString()),
-        recommendations: typeof predictionData.recommendations === 'string' 
-          ? predictionData.recommendations 
-          : JSON.stringify(predictionData.recommendations),
+        recommendations: predictionData.recommendations || 'Continue monitoring your wound and follow healthcare provider advice.',
       };
       
       console.log("Cleaned prediction data:", cleanData);
@@ -30,7 +28,7 @@ export const PredictionHandler = {
       
       console.log("Prediction created successfully:", data);
       return data;
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error creating prediction:", error);
       if (error.response) {
         console.error("Response data:", error.response.data);
