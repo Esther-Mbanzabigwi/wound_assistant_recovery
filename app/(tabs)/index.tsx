@@ -1,4 +1,4 @@
-import { Link } from "expo-router";
+import { Link, router } from "expo-router";
 import { StyleSheet, Text, View } from "react-native";
 import AppLayout from "../../components/AppLayout";
 import Button from "../../components/ui/Button";
@@ -57,23 +57,19 @@ export default function OverviewScreen() {
           </Text>
 
           <View style={styles.actionGrid}>
-            <Link href="/capture" asChild>
-              <Button
-                title="Take New Photo"
-                variant="primary"
-                onPress={() => {}}
-                style={styles.actionButton}
-              />
-            </Link>
+            <Button
+              title="Take New Photo"
+              variant="primary"
+              onPress={() => router.push("/(tabs)/capture")}
+              style={styles.actionButton}
+            />
 
-            <Link href="/history" asChild>
-              <Button
-                title="View History"
-                variant="secondary"
-                onPress={() => {}}
-                style={styles.actionButton}
-              />
-            </Link>
+            <Button
+              title="View History"
+              variant="secondary"
+              onPress={() => router.push("/(tabs)/history")}
+              style={styles.actionButton}
+            />
 
             <Link href="/hospitals" asChild>
               <Button

@@ -9,12 +9,33 @@ export const PredictionHandler = {
     predictionData: ICreatePrediction
   ): Promise<IPrediction> {
     try {
+      console.log("Creating prediction with data:", predictionData);
+      
+      // Ensure all required fields are present and properly formatted
+      const cleanData = {
+        image: predictionData.image,
+        user: predictionData.user,
+        prediction: predictionData.prediction,
+        predictionConfidence: parseFloat(predictionData.predictionConfidence.toString()),
+        recommendations: typeof predictionData.recommendations === 'string' 
+          ? predictionData.recommendations 
+          : JSON.stringify(predictionData.recommendations),
+      };
+      
+      console.log("Cleaned prediction data:", cleanData);
+      
       const { data } = await strapi.post("/predictions", {
-        data: predictionData,
+        data: cleanData,
       });
+      
+      console.log("Prediction created successfully:", data);
       return data;
     } catch (error) {
       console.error("Error creating prediction:", error);
+      if (error.response) {
+        console.error("Response data:", error.response.data);
+        console.error("Response status:", error.response.status);
+      }
       throw error;
     }
   },
@@ -40,6 +61,7 @@ export const PredictionHandler = {
 
   async getUserPredictions(userId: number): Promise<IPrediction[]> {
     try {
+      console.log("Fetching predictions for user:", userId);
       const { data } = await strapi.get("/predictions", {
         params: {
           filters: {
@@ -49,6 +71,7 @@ export const PredictionHandler = {
           sort: ["createdAt:desc"],
         },
       });
+      console.log("API response:", data);
       return data.data;
     } catch (error) {
       console.error("Error fetching user predictions:", error);
@@ -72,12 +95,14 @@ export const PredictionHandler = {
 
   async getAllPredictions(): Promise<IPrediction[]> {
     try {
+      console.log("Fetching all predictions");
       const { data } = await strapi.get("/predictions", {
         params: {
           populate: ["user", "image"],
           sort: ["createdAt:desc"],
         },
       });
+      console.log("All predictions API response:", data);
       return data.data;
     } catch (error) {
       console.error("Error fetching all predictions:", error);

@@ -4,7 +4,6 @@ export interface IPrediction {
   id: string;
   documentId: string;
   image: any;
-  predictionStatus: string;
   predictionConfidence: number;
   user: IUser;
   recommendations: JSON;
@@ -13,7 +12,6 @@ export interface IPrediction {
 
 export interface ICreatePrediction {
   image: string;
-  predictionStatus: string;
   predictionConfidence: number;
   user: string;
   recommendations: JSON;
