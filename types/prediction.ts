@@ -6,7 +6,7 @@ export interface IPrediction {
   image: any;
   predictionConfidence: number;
   user: IUser;
-  recommendations: JSON;
+  recommendations: string;
   prediction: string;
 }
 
@@ -14,6 +14,6 @@ export interface ICreatePrediction {
   image: string;
   predictionConfidence: number;
   user: string;
-  recommendations: JSON;
+  recommendations: string;
   prediction: string;
 }
