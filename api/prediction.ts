@@ -9,7 +9,6 @@ export const PredictionHandler = {
     predictionData: ICreatePrediction
   ): Promise<IPrediction> {
     try {
-      console.log("Creating prediction with data:", predictionData);
       
       // Ensure all required fields are present and properly formatted
       const cleanData = {
@@ -19,14 +18,11 @@ export const PredictionHandler = {
         predictionConfidence: parseFloat(predictionData.predictionConfidence.toString()),
         recommendations: predictionData.recommendations || 'Continue monitoring your wound and follow healthcare provider advice.',
       };
-      
-      console.log("Cleaned prediction data:", cleanData);
-      
+            
       const { data } = await strapi.post("/predictions", {
         data: cleanData,
       });
       
-      console.log("Prediction created successfully:", data);
       return data;
     } catch (error: any) {
       console.error("Error creating prediction:", error);
@@ -59,7 +55,6 @@ export const PredictionHandler = {
 
   async getUserPredictions(userId: number): Promise<IPrediction[]> {
     try {
-      console.log("Fetching predictions for user:", userId);
       const { data } = await strapi.get("/predictions", {
         params: {
           filters: {
@@ -69,7 +64,6 @@ export const PredictionHandler = {
           sort: ["createdAt:desc"],
         },
       });
-      console.log("API response:", data);
       return data.data;
     } catch (error) {
       console.error("Error fetching user predictions:", error);
@@ -93,14 +87,12 @@ export const PredictionHandler = {
 
   async getAllPredictions(): Promise<IPrediction[]> {
     try {
-      console.log("Fetching all predictions");
       const { data } = await strapi.get("/predictions", {
         params: {
           populate: ["user", "image"],
           sort: ["createdAt:desc"],
         },
       });
-      console.log("All predictions API response:", data);
       return data.data;
     } catch (error) {
       console.error("Error fetching all predictions:", error);

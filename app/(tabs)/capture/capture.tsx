@@ -1,9 +1,13 @@
 import api from "@/api";
-import PredictionHandler from "@/api/prediction";
+import { PredictionHandler } from "@/api/prediction";
+import AppLayout from "@/components/AppLayout";
+import Button from "@/components/ui/Button";
+import { Colors } from "@/constants/Colors";
 import { useAuthContext } from "@/context/authcontext";
 import { IImage } from "@/types/imageType";
 import { ICreatePrediction } from "@/types/prediction";
 import * as ImagePicker from "expo-image-picker";
+import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -13,10 +17,6 @@ import {
   Text,
   View,
 } from "react-native";
-import { router } from "expo-router";
-import AppLayout from "@/components/AppLayout";
-import Button from "@/components/ui/Button";
-import { Colors } from "@/constants/Colors";
 
 export default function CaptureScreen() {
   const [image, setImage] = useState<ImagePicker.ImagePickerAsset | null>(null);
@@ -36,6 +36,8 @@ export default function CaptureScreen() {
     })();
   }, []);
 
+  console.log("============================");
+
   const analyzeWound = async () => {
     try {
       setLoading(true);
@@ -43,26 +45,32 @@ export default function CaptureScreen() {
         image!
       )) as IImage;
       const prediction = await api.classifyWound(image!);
+      console.log("============================");
       console.log(prediction);
+      console.log("============================");
       const newPrediction: ICreatePrediction = {
         image: strapiImage.id.toString(),
         user: user?.documentId.toString() || "",
         recommendations: prediction.recommendations as any,
         prediction: prediction.predicted_class!,
         predictionConfidence: prediction.confidence!,
-        predictionStatus: "completed",
       };
       console.log(newPrediction);
-      const createdPrediction = await PredictionHandler.createPrediction(newPrediction);
-      
+      const createdPrediction = await PredictionHandler.createPrediction(
+        newPrediction
+      );
+
       // Navigate to result screen with prediction data
       router.push({
-        pathname: "/results/capture-result",
+        pathname: "/capture/result",
         params: {
           imageUri: image!.uri,
           result: prediction.predicted_class!,
           confidence: prediction.confidence!.toString(),
           predictionId: createdPrediction.id,
+          recommendations: Array.isArray(prediction.recommendations)
+            ? prediction.recommendations.join("|")
+            : prediction.recommendations || "",
         },
       });
     } catch (error) {
@@ -217,4 +225,4 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: Colors.light.gray[500],
   },
-}); 
+});
