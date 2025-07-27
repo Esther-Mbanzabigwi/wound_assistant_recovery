@@ -48,16 +48,13 @@ export default function LandingScreen() {
             <Button
               variant="primary"
               style={styles.energyButton}
-              title={
-                <View style={styles.buttonContent}>
-                  <Ionicons name="rocket" size={22} color="#fff" style={{ marginRight: 8 }} />
-                  <Text style={styles.energyButtonText}>Get Started</Text>
-                </View>
-              }
+              title="Get Started"
+              icon={<Ionicons name="rocket" size={22} color="#fff" style={{ marginRight: 8 }} />}
+              onPress={() => {}}
             />
           </Link>
           <Link href="/(auth)/login" asChild>
-            <Button variant="secondary" style={styles.button} title="Login" />
+            <Button variant="secondary" style={styles.button} title="Login" onPress={() => {}} />
           </Link>
         </View>
       </ScrollView>
@@ -199,17 +196,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
   },
-  buttonContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  energyButtonText: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: 'bold',
-    letterSpacing: 0.5,
-  },
+
   button: {
     marginBottom: 10,
     borderRadius: 14,

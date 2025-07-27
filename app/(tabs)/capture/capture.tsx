@@ -44,32 +44,25 @@ export default function CaptureScreen() {
       )) as IImage;
       const prediction = await api.classifyWound(image!);
       console.log(prediction);
-      // Format recommendations properly for storage
-      const formattedRecommendations = Array.isArray(prediction.recommendations) 
-        ? prediction.recommendations.join(' | ')
-        : prediction.recommendations || 'Continue monitoring your wound and follow healthcare provider advice.';
-      
       const newPrediction: ICreatePrediction = {
         image: strapiImage.id.toString(),
-        user: user?.documentId?.toString() || "1", // Default to user 1 if no user ID
-        recommendations: formattedRecommendations,
+        user: user?.documentId.toString() || "",
+        recommendations: prediction.recommendations as any,
         prediction: prediction.predicted_class!,
         predictionConfidence: prediction.confidence!,
+        predictionStatus: "completed",
       };
       console.log(newPrediction);
       const createdPrediction = await PredictionHandler.createPrediction(newPrediction);
       
       // Navigate to result screen with prediction data
       router.push({
-        pathname: "/capture/result",
+        pathname: "/results/capture-result",
         params: {
           imageUri: image!.uri,
           result: prediction.predicted_class!,
           confidence: prediction.confidence!.toString(),
           predictionId: createdPrediction.id,
-          recommendations: Array.isArray(prediction.recommendations) 
-            ? prediction.recommendations.join('|') 
-            : prediction.recommendations || '',
         },
       });
     } catch (error) {

@@ -1,19 +1,23 @@
-import { IUser } from "./usertype";
+export interface ICreatePrediction {
+  image: string;
+  user: string;
+  prediction: string;
+  predictionConfidence: number;
+  recommendations: string | string[];
+  predictionStatus?: string;
+}
 
 export interface IPrediction {
   id: string;
-  documentId: string;
-  image: any;
-  predictionConfidence: number;
-  user: IUser;
-  recommendations: string;
-  prediction: string;
-}
-
-export interface ICreatePrediction {
-  image: string;
-  predictionConfidence: number;
-  user: string;
-  recommendations: string;
-  prediction: string;
-}
+  attributes: {
+    image: string;
+    user: string;
+    prediction: string;
+    predictionConfidence: number;
+    recommendations: string | string[];
+    predictionStatus?: string;
+    createdAt: string;
+    updatedAt: string;
+    publishedAt: string;
+  };
+} 
