@@ -16,6 +16,11 @@ export function useThemeColor(
   if (colorFromProps) {
     return colorFromProps;
   } else {
-    return Colors[theme][colorName];
+    const color = Colors[theme][colorName];
+    // Handle nested color objects (like blue.500)
+    if (typeof color === 'object') {
+      return color[500] || color[400] || Object.values(color)[0];
+    }
+    return color;
   }
 }

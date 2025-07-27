@@ -16,7 +16,7 @@ type IconSymbolName = keyof typeof MAPPING;
  * - see Material Icons in the [Icons Directory](https://icons.expo.fyi).
  * - see SF Symbols in the [SF Symbols](https://developer.apple.com/sf-symbols/) app.
  */
-const MAPPING = {
+const MAPPING: Record<string, ComponentProps<typeof MaterialIcons>["name"]> = {
   "house.fill": "home",
   "paperplane.fill": "send",
   "chevron.left.forwardslash.chevron.right": "code",
@@ -25,7 +25,7 @@ const MAPPING = {
   mail: "email",
   phone: "phone",
   lock: "lock",
-} as IconMapping;
+};
 
 /**
  * An icon component that uses native SF Symbols on iOS, and Material Icons on Android and web.

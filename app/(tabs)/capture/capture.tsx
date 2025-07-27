@@ -57,7 +57,7 @@ export default function CaptureScreen() {
       
       // Navigate to result screen with prediction data
       router.push({
-        pathname: "/results/capture-result",
+        pathname: "/capture/result",
         params: {
           imageUri: image!.uri,
           result: prediction.predicted_class!,

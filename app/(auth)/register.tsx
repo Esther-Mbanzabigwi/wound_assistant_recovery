@@ -180,7 +180,6 @@ export default function RegisterScreen() {
                 }}
                 keyboardType="email-address"
                 autoCapitalize="none"
-                autoCorrect={false}
                 icon="mail"
                 error={errors.email}
               />
@@ -218,7 +217,6 @@ export default function RegisterScreen() {
                 }}
                 secureTextEntry
                 autoCapitalize="none"
-                autoCorrect={false}
                 icon="lock"
                 error={errors.password}
               />
@@ -238,7 +236,6 @@ export default function RegisterScreen() {
                 }}
                 secureTextEntry
                 autoCapitalize="none"
-                autoCorrect={false}
                 icon="lock"
                 error={errors.confirmPassword}
               />

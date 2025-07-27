@@ -89,7 +89,8 @@ export const PredictionHandler = {
       return data.data;
     } catch (error) {
       console.error("Error fetching user predictions:", error);
-      throw error;
+      // Return empty array if backend is not available
+      return [];
     }
   },
 
@@ -103,7 +104,8 @@ export const PredictionHandler = {
       return data.data;
     } catch (error) {
       console.error("Error fetching prediction:", error);
-      throw error;
+      // Return null if backend is not available
+      return null as any;
     }
   },
 
@@ -120,7 +122,8 @@ export const PredictionHandler = {
       return data.data;
     } catch (error) {
       console.error("Error fetching all predictions:", error);
-      throw error;
+      // Return empty array if backend is not available
+      return [];
     }
   },
 };

@@ -23,6 +23,7 @@ export const Colors = {
     warning: "#f59e0b",
     danger: "#ef4444",
     info: "#06b6d4",
+    icon: "#64748b",
     gray: {
       50: "#f8fafc",
       100: "#f1f5f9",
@@ -64,6 +65,7 @@ export const Colors = {
     warning: "#f59e0b",
     danger: "#ef4444",
     info: "#06b6d4",
+    icon: "#94a3b8",
     gray: {
       50: "#0f172a",
       100: "#1e293b",

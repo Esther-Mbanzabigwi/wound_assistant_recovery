@@ -78,7 +78,7 @@ export default function HistoryScreen() {
         style={[SharedStyles.card, styles.historyCard]}
         onPress={() => {
           router.push({
-            pathname: '/results/history-result',
+            pathname: '/history/result',
             params: {
               imageUri: imageUrl || '',
               result: item.prediction,
