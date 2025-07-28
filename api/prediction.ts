@@ -10,22 +10,26 @@ export const PredictionHandler = {
   ): Promise<IPrediction> {
     try {
       console.log("Creating prediction with data:", predictionData);
-      
+
       // Ensure all required fields are present and properly formatted
       const cleanData = {
         image: predictionData.image,
         user: predictionData.user,
         prediction: predictionData.prediction,
-        predictionConfidence: parseFloat(predictionData.predictionConfidence.toString()),
-        recommendations: predictionData.recommendations || 'Continue monitoring your wound and follow healthcare provider advice.',
+        predictionConfidence: parseFloat(
+          predictionData.predictionConfidence.toString()
+        ),
+        recommendations:
+          predictionData.recommendations ||
+          "Continue monitoring your wound and follow healthcare provider advice.",
       };
-      
+
       console.log("Cleaned prediction data:", cleanData);
-      
+
       const { data } = await strapi.post("/predictions", {
         data: cleanData,
       });
-      
+
       console.log("Prediction created successfully:", data);
       return data;
     } catch (error: any) {
@@ -34,7 +38,7 @@ export const PredictionHandler = {
         console.error("Response data:", error.response.data);
         console.error("Response status:", error.response.status);
       }
-      
+
       // Return a mock prediction object to allow the app to continue
       // This is a temporary fix until the backend is properly configured
       console.log("Returning mock prediction due to backend error");
@@ -49,7 +53,7 @@ export const PredictionHandler = {
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
           publishedAt: new Date().toISOString(),
-        }
+        },
       } as IPrediction;
     }
   },
@@ -115,7 +119,7 @@ export const PredictionHandler = {
       const { data } = await strapi.get("/predictions", {
         params: {
           populate: ["user", "image"],
-          sort: ["createdAt:desc"],
+          sort: ["createdAt:asc"],
         },
       });
       console.log("All predictions API response:", data);

@@ -1,9 +1,13 @@
 import api from "@/api";
-import PredictionHandler from "@/api/prediction";
+import { PredictionHandler } from "@/api/prediction";
+import AppLayout from "@/components/AppLayout";
+import Button from "@/components/ui/Button";
+import { Colors } from "@/constants/Colors";
 import { useAuthContext } from "@/context/authcontext";
 import { IImage } from "@/types/imageType";
 import { ICreatePrediction } from "@/types/prediction";
 import * as ImagePicker from "expo-image-picker";
+import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -13,10 +17,6 @@ import {
   Text,
   View,
 } from "react-native";
-import { router } from "expo-router";
-import AppLayout from "@/components/AppLayout";
-import Button from "@/components/ui/Button";
-import { Colors } from "@/constants/Colors";
 
 export default function CaptureScreen() {
   const [image, setImage] = useState<ImagePicker.ImagePickerAsset | null>(null);
@@ -36,40 +36,49 @@ export default function CaptureScreen() {
     })();
   }, []);
 
-  const analyzeWound = async () => {
+  const analyzeWound = async (selectedImage?: ImagePicker.ImagePickerAsset) => {
     try {
       setLoading(true);
+      const imageToAnalyze = selectedImage || image;
+      if (!imageToAnalyze) {
+        throw new Error("No image selected");
+      }
+
       const strapiImage = (await PredictionHandler.uploadImage(
-        image!
+        imageToAnalyze
       )) as IImage;
-      const prediction = await api.classifyWound(image!);
+      const prediction = await api.classifyWound(imageToAnalyze);
       console.log(prediction);
       // Format recommendations properly for storage
-      const formattedRecommendations = Array.isArray(prediction.recommendations) 
-        ? prediction.recommendations.join(' | ')
-        : prediction.recommendations || 'Continue monitoring your wound and follow healthcare provider advice.';
-      
+      const formattedRecommendations = JSON.stringify(
+        prediction.recommendations || []
+      );
+
       const newPrediction: ICreatePrediction = {
         image: strapiImage.id.toString(),
-        user: user?.documentId?.toString() || "1", // Default to user 1 if no user ID
+        user: user?.id?.toString() || "",
         recommendations: formattedRecommendations,
         prediction: prediction.predicted_class!,
         predictionConfidence: prediction.confidence!,
       };
-      console.log(newPrediction);
-      const createdPrediction = await PredictionHandler.createPrediction(newPrediction);
-      
+      console.log("===================");
+      console.log(JSON.stringify(newPrediction));
+      console.log("===================");
+      const createdPrediction = await PredictionHandler.createPrediction(
+        newPrediction
+      );
+
       // Navigate to result screen with prediction data
       router.push({
         pathname: "/capture/result",
         params: {
-          imageUri: image!.uri,
+          imageUri: imageToAnalyze.uri,
           result: prediction.predicted_class!,
           confidence: prediction.confidence!.toString(),
           predictionId: createdPrediction.id,
-          recommendations: Array.isArray(prediction.recommendations) 
-            ? prediction.recommendations.join('|') 
-            : prediction.recommendations || '',
+          recommendations: Array.isArray(prediction.recommendations)
+            ? prediction.recommendations.join("|")
+            : prediction.recommendations || "",
         },
       });
     } catch (error) {
@@ -93,8 +102,10 @@ export default function CaptureScreen() {
       });
 
       if (!result.canceled) {
-        setImage(result.assets[0]);
-        analyzeWound();
+        const selectedImage = result.assets[0];
+        setImage(selectedImage);
+        // Pass the selected image directly to analyzeWound
+        await analyzeWound(selectedImage);
       }
     } catch (error) {
       console.log(error);
@@ -112,8 +123,10 @@ export default function CaptureScreen() {
       });
 
       if (!result.canceled) {
-        setImage(result.assets[0]);
-        analyzeWound();
+        const selectedImage = result.assets[0];
+        setImage(selectedImage);
+        // Pass the selected image directly to analyzeWound
+        await analyzeWound(selectedImage);
       }
     } catch (error) {
       console.log(error);
@@ -224,4 +237,4 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: Colors.light.gray[500],
   },
-}); 
+});
